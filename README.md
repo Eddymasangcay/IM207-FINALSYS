@@ -7,7 +7,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
 [![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app)
 [![PayMongo](https://img.shields.io/badge/PayMongo-6A1B9A?style=for-the-badge&logo=moneygram&logoColor=white)](https://paymongo.com)
-[![Gunicorn](https://img.shields.io/badge/Gunicorn-499848?style=for-the-badge&logo=gunicorn&logoColor=white)](https://gunicorn.org)
+[![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/board/t3X2NkmHzongN0VsYPoC4D/Chukakoy-Car-Rental---Entity-Relationship-Diagram?node-id=0-1&t=pq38QzFM8nLPN6Wv-1)
 
 </div>
 
