@@ -132,36 +132,6 @@ body.ck-page-dashboard .dashboard {
         font-weight: 800;
     }
 
-    .dash-stats-toggle-controls {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .dash-stats-toggle-controls .dash-side-link {
-        justify-content: flex-start;
-        text-align: left;
-    }
-
-    .dash-stats-panel {
-        display: none;
-        margin-top: 10px;
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 14px;
-        padding: 10px;
-        background: #0f1726;
-    }
-
-    .dash-stats-panel.is-open {
-        display: block;
-    }
-
-    .dash-stats-toggle-btn.is-active {
-        background: rgba(232, 162, 61, 0.22);
-        border-color: rgba(232, 162, 61, 0.4);
-        color: #fde68a;
-    }
-
     .dash-admin-stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
@@ -224,6 +194,51 @@ body.ck-page-dashboard .dashboard {
 }
 
 .dash-submenu .dash-side-link {
+    width: 100%;
+    margin-top: 6px;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.84rem;
+}
+
+/* Make other nested accordion groups match "My rental requests" */
+.dash-accordion-panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 8px;
+    margin-top: 0;
+    box-shadow: none;
+}
+
+.dash-accordion-panel > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #334155;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.dash-accordion-panel > summary::-webkit-details-marker {
+    display: none;
+}
+
+.dash-accordion-panel[open] > summary {
+    margin-bottom: 6px;
+}
+
+.dash-accordion-panel > summary::after {
+    content: none;
+}
+
+.dash-accordion-content {
+    padding: 0;
+}
+
+.dash-accordion-content .dash-side-link {
     width: 100%;
     margin-top: 6px;
     border-radius: 10px;
@@ -946,15 +961,10 @@ body.ck-page-dashboard .dashboard {
     .dash-mobile-links {
         padding: 10px;
         gap: 10px;
-    }
-
-    .dash-stats-toggle-controls {
-        display: none;
-    }
-
-    .dash-stats-panel {
-        display: block;
-        margin-top: 6px;
+        max-height: 52dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
     }
 
     .dash-accordion-panel {
@@ -991,6 +1001,10 @@ body.ck-page-dashboard .dashboard {
 
     .dash-accordion-content {
     padding: 0;
+        max-height: 34dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
 }
 
 .dash-accordion-content .dash-side-link {
@@ -2672,7 +2686,7 @@ body.ck-page-dashboard .dash-advanced {
 body.ck-page-dashboard .dash-accordion-panel {
     background: #111b29 !important;
     border-color: rgba(148, 163, 184, 0.18) !important;
-    box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.08);
+    box-shadow: none;
 }
 
 body.ck-page-dashboard .dash-mobile-group {
@@ -2707,14 +2721,6 @@ body.ck-page-dashboard .dash-submenu > summary,
 body.ck-page-dashboard .dash-advanced > summary,
 body.ck-page-dashboard .dash-accordion-panel > summary {
     color: #dbe4f0;
-}
-
-body.ck-page-dashboard .dash-accordion-panel > summary::after {
-    color: #9fb0c7;
-}
-
-body.ck-page-dashboard .dash-accordion-panel[open] > summary::after {
-    color: #f8fafc;
 }
 
 /* Remove remaining light blocks in dashboard panels */

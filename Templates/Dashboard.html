@@ -108,76 +108,11 @@
                 <details class="dash-mobile-group" open>
                     <summary>Statistics</summary>
                     <div class="dash-mobile-links">
-                        <div class="dash-stats-toggle-controls">
-                            {% if admin_stats %}
-                            <button type="button" class="dash-side-link dash-stats-toggle-btn" data-stats-target="dash-stats-panel">Statistics</button>
-                            {% endif %}
-                            {% if admin_charts %}
-                            <button type="button" class="dash-side-link dash-stats-toggle-btn" data-stats-target="dash-analytics-panel">Operational analytics</button>
-                            {% endif %}
-                        </div>
                         {% if admin_stats %}
-                        <div id="dash-stats-panel" class="dash-stats-panel">
-                            <div class="admin-stats-grid dash-admin-stats-grid">
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Pending ID / rental requests</span>
-                                    <span class="admin-stat-value">{{ admin_stats.pending_id_requests }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Fleet listings</span>
-                                    <span class="admin-stat-value">{{ admin_stats.fleet_listings }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Active rentals (on the road)</span>
-                                    <span class="admin-stat-value">{{ admin_stats.active_rentals_now }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Approved — awaiting payment</span>
-                                    <span class="admin-stat-value">{{ admin_stats.approved_awaiting_payment }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Paid bookings (all time)</span>
-                                    <span class="admin-stat-value">{{ admin_stats.paid_bookings_all_time }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Revenue (paid, USD)</span>
-                                    <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_paid_bookings_usd }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Revenue this month (USD)</span>
-                                    <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_this_month_usd }}</span>
-                                </div>
-                                <div class="admin-stat-card">
-                                    <span class="admin-stat-label">Fleet utilization</span>
-                                    <span class="admin-stat-value">{{ '%.1f' % admin_stats.fleet_utilization_pct }}%</span>
-                                </div>
-                            </div>
-                        </div>
+                        <button type="button" class="dash-side-link" data-target="dash-statistics-overview">Statistics</button>
                         {% endif %}
                         {% if admin_charts %}
-                        <div id="dash-analytics-panel" class="dash-sidebar-graphs dash-stats-panel">
-                            <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
-                            <div class="admin-graphs-grid">
-                                <div class="admin-graph-card">
-                                    <h4>Rental request statuses</h4>
-                                    {% for item in admin_charts.rental_request_status %}
-                                    <div class="bar-row">
-                                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
-                                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                <div class="admin-graph-card">
-                                    <h4>Booking lifecycle</h4>
-                                    {% for item in admin_charts.booking_lifecycle %}
-                                    <div class="bar-row">
-                                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
-                                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
+                        <button type="button" class="dash-side-link" data-target="dash-operational-analytics">Operational analytics</button>
                         {% endif %}
                     </div>
                 </details>
@@ -387,6 +322,74 @@
             <p class="muted">No payment transactions yet.</p>
             {% endif %}
         </div>
+
+        {% if is_staff and admin_stats %}
+        <div class="post-form dashboard-panel" id="dash-statistics-overview">
+            <h3>Statistics</h3>
+            <p class="muted">Core operational summary cards.</p>
+            <div class="admin-stats-grid dash-admin-stats-grid">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Pending ID / rental requests</span>
+                    <span class="admin-stat-value">{{ admin_stats.pending_id_requests }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Fleet listings</span>
+                    <span class="admin-stat-value">{{ admin_stats.fleet_listings }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Active rentals (on the road)</span>
+                    <span class="admin-stat-value">{{ admin_stats.active_rentals_now }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Approved — awaiting payment</span>
+                    <span class="admin-stat-value">{{ admin_stats.approved_awaiting_payment }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Paid bookings (all time)</span>
+                    <span class="admin-stat-value">{{ admin_stats.paid_bookings_all_time }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Revenue (paid, USD)</span>
+                    <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_paid_bookings_usd }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Revenue this month (USD)</span>
+                    <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_this_month_usd }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">Fleet utilization</span>
+                    <span class="admin-stat-value">{{ '%.1f' % admin_stats.fleet_utilization_pct }}%</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if is_staff and admin_charts %}
+        <div class="post-form admin-graphs dashboard-panel" id="dash-operational-analytics">
+            <h3>Operational analytics</h3>
+            <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
+            <div class="admin-graphs-grid">
+                <div class="admin-graph-card">
+                    <h4>Rental request statuses</h4>
+                    {% for item in admin_charts.rental_request_status %}
+                    <div class="bar-row">
+                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="admin-graph-card">
+                    <h4>Booking lifecycle</h4>
+                    {% for item in admin_charts.booking_lifecycle %}
+                    <div class="bar-row">
+                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% endif %}
 
         <div class="post-form settings-col dashboard-panel" id="dash-profile">
@@ -1060,8 +1063,6 @@
             const panels = Array.from(document.querySelectorAll('.dashboard-panel'));
             const mobileGroups = Array.from(document.querySelectorAll('.dash-mobile-group'));
             const nestedAccordions = Array.from(document.querySelectorAll('.dash-accordion-panel'));
-            const statsToggleButtons = Array.from(document.querySelectorAll('.dash-stats-toggle-btn'));
-            const statsPanels = Array.from(document.querySelectorAll('.dash-stats-panel'));
             const drawerToggle = document.getElementById('dash-drawer-toggle');
             const drawerClose = document.getElementById('dash-drawer-close');
             const drawerPanel = document.getElementById('dash-sidebar-panel');
@@ -1145,40 +1146,7 @@
                 });
             }
 
-            function setStatsPanel(targetId) {
-                const shouldDesktopToggle = !isMobile();
-                statsPanels.forEach((panel) => {
-                    if (!shouldDesktopToggle) {
-                        panel.classList.add('is-open');
-                        return;
-                    }
-                    panel.classList.toggle('is-open', panel.id === targetId);
-                });
-                statsToggleButtons.forEach((btn) => {
-                    btn.classList.toggle('is-active', shouldDesktopToggle && btn.dataset.statsTarget === targetId);
-                });
-            }
-
-            function syncStatsPanelsByViewport() {
-                if (!statsPanels.length) return;
-                if (isMobile()) {
-                    setStatsPanel('');
-                    return;
-                }
-                setStatsPanel('');
-            }
-
             syncNestedAccordionsByViewport();
-            syncStatsPanelsByViewport();
-
-            statsToggleButtons.forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    if (isMobile()) return;
-                    const targetId = btn.dataset.statsTarget || '';
-                    const isAlreadyOpen = btn.classList.contains('is-active');
-                    setStatsPanel(isAlreadyOpen ? '' : targetId);
-                });
-            });
 
             if (drawerToggle) {
                 let dragging = false;
@@ -1258,7 +1226,6 @@
             window.addEventListener('resize', () => {
                 if (!isMobile()) setDrawerState(false);
                 syncNestedAccordionsByViewport();
-                syncStatsPanelsByViewport();
             });
 
             showPanel(links[0].dataset.target, links[0].dataset.requestFilter || 'all');
