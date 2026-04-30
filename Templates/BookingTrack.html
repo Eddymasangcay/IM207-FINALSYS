@@ -18,6 +18,7 @@
                 Status:
                 <span class="track-status-pill track-status-{{ (booking.booking_status or 'confirmed')|lower }}">
                     {% if booking.booking_status == 'cancelled' %}Cancelled
+                    {% elif booking.booking_status == 'active' %}Active
                     {% elif booking.delivery_returned %}Returned (admin)
                     {% elif booking.delivery_returned_by_user %}Returned (you)
                     {% else %}In-Delivery

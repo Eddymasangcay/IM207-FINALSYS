@@ -43,8 +43,9 @@
             </div>
         </div>
 
-        {% if is_staff and admin_stats %}
-        <div class="admin-stats-grid post-form">
+        {% if is_staff and (admin_stats or admin_charts) %}
+        {% if admin_stats %}
+        <div class="admin-stats-grid post-form dash-desktop-only">
             <div class="admin-stat-card">
                 <span class="admin-stat-label">Pending ID / rental requests</span>
                 <span class="admin-stat-value">{{ admin_stats.pending_id_requests }}</span>
@@ -79,10 +80,46 @@
             </div>
         </div>
         {% endif %}
+        {% if admin_charts %}
+        <div class="post-form admin-graphs dash-desktop-only">
+            <h3>Operations graphs</h3>
+            <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
+            <div class="admin-graphs-grid">
+                <div class="admin-graph-card">
+                    <h4>Rental request statuses</h4>
+                    {% for item in admin_charts.rental_request_status %}
+                    <div class="bar-row">
+                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="admin-graph-card">
+                    <h4>Booking lifecycle</h4>
+                    {% for item in admin_charts.booking_lifecycle %}
+                    <div class="bar-row">
+                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
 
         <div class="dashboard-layout">
-            <aside class="dashboard-sidebar" aria-label="Dashboard sections">
-                <h3>Dashboard menu</h3>
+            <button type="button" id="dash-drawer-toggle" class="dash-drawer-toggle" aria-label="Open dashboard menu" aria-controls="dash-sidebar-panel" aria-expanded="false">
+                <span class="dash-drawer-toggle-bar" aria-hidden="true"></span>
+                <span class="dash-drawer-toggle-bar" aria-hidden="true"></span>
+                <span class="dash-drawer-toggle-bar" aria-hidden="true"></span>
+            </button>
+            <div id="dash-drawer-backdrop" class="dash-drawer-backdrop" hidden></div>
+            <aside id="dash-sidebar-panel" class="dashboard-sidebar" aria-label="Dashboard sections">
+                <div class="dash-sidebar-head">
+                    <h3>Dashboard menu</h3>
+                    <button type="button" id="dash-drawer-close" class="dash-drawer-close" aria-label="Close dashboard menu">&times;</button>
+                </div>
                 <details class="dash-mobile-group" open>
                     <summary>Essentials</summary>
                     <div class="dash-mobile-links">
@@ -118,43 +155,10 @@
                 <details class="dash-mobile-group" open>
                     <summary>Operations</summary>
                     <div class="dash-mobile-links">
-                        <details class="dash-accordion-panel" open>
-                            <summary>Monitoring</summary>
-                            <div class="dash-accordion-content">
-                                <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
-                                <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
-                                <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
-                                <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
-                            </div>
-                        </details>
-                        {% if admin_charts %}
-                        <details class="dash-accordion-panel dash-sidebar-graphs" open>
-                            <summary>Operations graphs</summary>
-                            <div class="dash-accordion-content">
-                                <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
-                                <div class="admin-graphs-grid">
-                                    <div class="admin-graph-card">
-                                        <h4>Rental request statuses</h4>
-                                        {% for item in admin_charts.rental_request_status %}
-                                        <div class="bar-row">
-                                            <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
-                                            <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                    <div class="admin-graph-card">
-                                        <h4>Booking lifecycle</h4>
-                                        {% for item in admin_charts.booking_lifecycle %}
-                                        <div class="bar-row">
-                                            <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
-                                            <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </details>
-                        {% endif %}
+                        <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
+                        <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
+                        <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
+                        <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
                     </div>
                 </details>
                 <details class="dash-mobile-group dash-advanced-group" open>
@@ -165,6 +169,76 @@
                         <button type="button" class="dash-side-link" data-target="sec-users">Manage users</button>
                     </div>
                 </details>
+                {% if admin_stats or admin_charts %}
+                <details class="dash-mobile-group dash-mobile-only" open>
+                    <summary>Statistics</summary>
+                    <div class="dash-mobile-links">
+                        {% if admin_stats %}
+                        <div class="dash-stats-wrap">
+                            <div class="admin-stats-grid dash-admin-stats-grid">
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Pending ID / rental requests</span>
+                                    <span class="admin-stat-value">{{ admin_stats.pending_id_requests }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Fleet listings</span>
+                                    <span class="admin-stat-value">{{ admin_stats.fleet_listings }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Active rentals (on the road)</span>
+                                    <span class="admin-stat-value">{{ admin_stats.active_rentals_now }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Approved — awaiting payment</span>
+                                    <span class="admin-stat-value">{{ admin_stats.approved_awaiting_payment }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Paid bookings (all time)</span>
+                                    <span class="admin-stat-value">{{ admin_stats.paid_bookings_all_time }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Revenue (paid, USD)</span>
+                                    <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_paid_bookings_usd }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Revenue this month (USD)</span>
+                                    <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_this_month_usd }}</span>
+                                </div>
+                                <div class="admin-stat-card">
+                                    <span class="admin-stat-label">Fleet utilization</span>
+                                    <span class="admin-stat-value">{{ '%.1f' % admin_stats.fleet_utilization_pct }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if admin_charts %}
+                        <div class="dash-sidebar-graphs">
+                            <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
+                            <div class="admin-graphs-grid">
+                                <div class="admin-graph-card">
+                                    <h4>Rental request statuses</h4>
+                                    {% for item in admin_charts.rental_request_status %}
+                                    <div class="bar-row">
+                                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="admin-graph-card">
+                                    <h4>Booking lifecycle</h4>
+                                    {% for item in admin_charts.booking_lifecycle %}
+                                    <div class="bar-row">
+                                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </details>
+                {% endif %}
                 {% endif %}
             </aside>
 
@@ -651,6 +725,7 @@
                         <div class="plate-line">Rental status:
                             <span class="tag tag-booking-status">
                                 {% if b.booking_status == 'cancelled' %}Cancelled
+                                {% elif b.booking_status == 'active' %}Active
                                 {% elif b.delivery_returned %}Returned
                                 {% elif b.delivery_returned_by_user %}Returned (you)
                                 {% else %}In-Delivery
@@ -781,6 +856,7 @@
                             <div class="plate-line">Rental status:
                                 <span class="tag tag-booking-status">
                                     {% if b.booking_status == 'cancelled' %}Cancelled
+                                    {% elif b.booking_status == 'active' %}Active
                                     {% elif b.delivery_returned %}Returned
                                     {% elif b.delivery_returned_by_user %}Returned (you)
                                     {% else %}In-Delivery
@@ -1040,9 +1116,22 @@
             const links = Array.from(document.querySelectorAll('.dash-side-link'));
             const panels = Array.from(document.querySelectorAll('.dashboard-panel'));
             const mobileGroups = Array.from(document.querySelectorAll('.dash-mobile-group'));
+            const drawerToggle = document.getElementById('dash-drawer-toggle');
+            const drawerClose = document.getElementById('dash-drawer-close');
+            const drawerPanel = document.getElementById('dash-sidebar-panel');
+            const drawerBackdrop = document.getElementById('dash-drawer-backdrop');
             if (!links.length || !panels.length) return;
             const requestRows = Array.from(document.querySelectorAll('#dash-my-requests tbody tr[data-rr-status]'));
             const requestEmpty = document.getElementById('rr-empty-filtered');
+            const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+            function setDrawerState(open) {
+                if (!drawerPanel || !drawerBackdrop || !drawerToggle) return;
+                drawerPanel.classList.toggle('is-open', !!open);
+                drawerBackdrop.hidden = !open;
+                document.body.classList.toggle('ck-dash-drawer-open', !!open);
+                drawerToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
 
             function applyRequestFilter(filterVal) {
                 if (!requestRows.length) return;
@@ -1075,12 +1164,13 @@
             links.forEach((link) => {
                 link.addEventListener('click', () => {
                     showPanel(link.dataset.target, link.dataset.requestFilter || 'all');
+                    if (isMobile()) setDrawerState(false);
                 });
             });
 
             mobileGroups.forEach((group) => {
                 group.addEventListener('toggle', () => {
-                    if (!window.matchMedia('(max-width: 768px)').matches) return;
+                    if (!isMobile()) return;
                     if (!group.open) return;
                     mobileGroups.forEach((other) => {
                         if (other !== group) other.open = false;
@@ -1088,11 +1178,30 @@
                 });
             });
 
-            if (window.matchMedia('(max-width: 768px)').matches && mobileGroups.length) {
+            if (isMobile() && mobileGroups.length) {
                 mobileGroups.forEach((group, idx) => {
                     group.open = idx === 0;
                 });
             }
+
+            if (drawerToggle) {
+                drawerToggle.addEventListener('click', () => {
+                    const currentlyOpen = drawerPanel && drawerPanel.classList.contains('is-open');
+                    setDrawerState(!currentlyOpen);
+                });
+            }
+            if (drawerClose) {
+                drawerClose.addEventListener('click', () => setDrawerState(false));
+            }
+            if (drawerBackdrop) {
+                drawerBackdrop.addEventListener('click', () => setDrawerState(false));
+            }
+            document.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Escape') setDrawerState(false);
+            });
+            window.addEventListener('resize', () => {
+                if (!isMobile()) setDrawerState(false);
+            });
 
             showPanel(links[0].dataset.target, links[0].dataset.requestFilter || 'all');
         })();
