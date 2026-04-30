@@ -88,6 +88,51 @@ body.ck-page-dashboard .dashboard {
     display: none;
 }
 
+@media (min-width: 769px) {
+    .dashboard-sidebar {
+        gap: 12px;
+    }
+
+    .dash-mobile-group {
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 18px;
+        background: #111b29;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .dash-mobile-group > summary {
+        display: block;
+        list-style: none;
+        cursor: pointer;
+        padding: 18px 18px 16px;
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #cbd5e1;
+        border-bottom: 1px solid rgba(203, 213, 225, 0.35);
+        user-select: none;
+    }
+
+    .dash-mobile-group > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .dash-mobile-links {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .dash-mobile-group .dash-side-link {
+        border-radius: 24px;
+        min-height: 64px;
+        padding: 14px 18px;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+}
+
 .dash-mobile-links {
     display: flex;
     flex-direction: column;
