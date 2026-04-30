@@ -43,10 +43,10 @@ def _load_local_env_file():
 _load_local_env_file()
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-template_dir = 'templates' if os.path.isdir(os.path.join(basedir, 'templates')) else 'Templates'
+template_dir = 'Templates'
 app = Flask(__name__, static_folder='.', static_url_path='/static', template_folder=template_dir)
 template_search_paths = []
-for candidate in ('templates', 'Templates'):
+for candidate in ('Templates', 'templates'):
     abs_candidate = os.path.join(basedir, candidate)
     if os.path.isdir(abs_candidate):
         template_search_paths.append(abs_candidate)

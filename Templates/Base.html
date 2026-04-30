@@ -10,7 +10,7 @@
 <body class="ck-body {% block body_class %}{% endblock %}">
     {% include 'partials/SiteNav.html' %}
     {% block flashes %}
-    {% include ['partials/flashes.html', 'partials/Flashes.html'] %}
+    {% include 'partials/Flashes.html' %}
     {% endblock %}
     <main class="ck-main {% block main_class %}{% endblock %}">
         {% block content %}{% endblock %}
