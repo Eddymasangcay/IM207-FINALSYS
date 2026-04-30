@@ -48,6 +48,7 @@
                 <span class="dash-drawer-toggle-bar" aria-hidden="true"></span>
                 <span class="dash-drawer-toggle-bar" aria-hidden="true"></span>
                 <span class="dash-drawer-toggle-bar" aria-hidden="true"></span>
+                <span class="dash-drawer-toggle-text">Dash Panel</span>
             </button>
             <div id="dash-drawer-backdrop" class="dash-drawer-backdrop" hidden></div>
             <aside id="dash-sidebar-panel" class="dashboard-sidebar" aria-label="Dashboard sections">
@@ -1146,7 +1147,22 @@
                 });
             }
 
+            function syncTopGroupsByViewport() {
+                if (!mobileGroups.length) return;
+                if (isMobile()) {
+                    mobileGroups.forEach((group, idx) => {
+                        group.open = idx === 0;
+                    });
+                    return;
+                }
+                // Keep top dashboard groups visible on desktop.
+                mobileGroups.forEach((group) => {
+                    group.open = true;
+                });
+            }
+
             syncNestedAccordionsByViewport();
+            syncTopGroupsByViewport();
 
             if (drawerToggle) {
                 let dragging = false;
@@ -1226,6 +1242,7 @@
             window.addEventListener('resize', () => {
                 if (!isMobile()) setDrawerState(false);
                 syncNestedAccordionsByViewport();
+                syncTopGroupsByViewport();
             });
 
             showPanel(links[0].dataset.target, links[0].dataset.requestFilter || 'all');

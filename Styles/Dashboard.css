@@ -829,8 +829,8 @@ body.ck-page-dashboard .dashboard {
         justify-content: center;
         gap: 3px;
         flex-direction: column;
-        width: 42px;
-        height: 42px;
+        width: 74px;
+        height: 58px;
         border-radius: 10px;
         border: 1px solid rgba(148, 163, 184, 0.26);
         background: #111b29;
@@ -849,6 +849,17 @@ body.ck-page-dashboard .dashboard {
         height: 2px;
         border-radius: 999px;
         background: #dbe4f0;
+    }
+
+    .dash-drawer-toggle-text {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #dbe4f0;
+        line-height: 1;
+        text-transform: uppercase;
     }
 
     .dash-drawer-backdrop {
