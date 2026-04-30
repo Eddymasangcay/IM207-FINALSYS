@@ -455,3 +455,36 @@ body.ck-page-payment .post .meta strong {
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 480px) {
+    .pay-page-intro,
+    .pay-modern-wrap,
+    .pay-flash-wrap,
+    .gcash-qr-shell {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .pay-modern-card,
+    .gcash-qr-card {
+        border-radius: 14px;
+        padding: 16px 12px;
+    }
+
+    .pay-method-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pay-pill-inner {
+        min-height: 62px;
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+        padding: 10px 12px;
+    }
+
+    .rental-update-row .btn-publish,
+    .rental-update-row .ck-btn {
+        width: 100%;
+    }
+}

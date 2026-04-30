@@ -153,3 +153,18 @@
         padding: 28px 22px;
     }
 }
+
+@media (max-width: 380px) {
+    .auth-shell {
+        padding: 20px 10px 32px;
+    }
+
+    .auth-card {
+        border-radius: 16px;
+        padding: 20px 14px;
+    }
+
+    .auth-submit {
+        padding: 12px 14px;
+    }
+}

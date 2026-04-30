@@ -187,6 +187,34 @@
     }
 }
 
+@media (max-width: 600px) {
+    .receipt-page {
+        padding: 0 12px;
+    }
+
+    .receipt-header,
+    .receipt-body {
+        padding: 16px 14px;
+    }
+
+    .receipt-line,
+    .receipt-pricing-row,
+    .receipt-total {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .receipt-next {
+        padding: 16px 14px;
+    }
+
+    .receipt-next-actions .btn,
+    .receipt-next-actions .ck-btn {
+        width: 100%;
+    }
+}
+
 .receipt-next {
     margin: 24px auto 0;
     padding: 22px 24px;

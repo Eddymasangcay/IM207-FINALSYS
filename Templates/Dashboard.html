@@ -109,34 +109,44 @@
         <div class="dashboard-layout">
             <aside class="dashboard-sidebar" aria-label="Dashboard sections">
                 <h3>Dashboard menu</h3>
-                <p class="dash-side-group-label">Essential</p>
-                <details class="dash-submenu" open>
-                    <summary>My rental requests</summary>
-                    <button type="button" class="dash-side-link is-active" data-target="dash-my-requests" data-request-filter="all">All requests</button>
-                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="paid">Paid</button>
-                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="approved">Approved</button>
-                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="pending_review">Awaiting admin</button>
-                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="rejected">Rejected</button>
+                <details class="dash-mobile-group" open>
+                    <summary>Essentials</summary>
+                    <div class="dash-mobile-links">
+                        <details class="dash-submenu" open>
+                            <summary>My rental requests</summary>
+                            <button type="button" class="dash-side-link is-active" data-target="dash-my-requests" data-request-filter="all">All requests</button>
+                            <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="paid">Paid</button>
+                            <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="approved">Approved</button>
+                            <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="pending_review">Awaiting admin</button>
+                            <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="rejected">Rejected</button>
+                        </details>
+                        <button type="button" class="dash-side-link" data-target="sec-bookings">Your bookings</button>
+                        {% if is_staff or is_admin %}
+                        <button type="button" class="dash-side-link" data-target="sec-admin-bookings">All bookings (admin)</button>
+                        {% endif %}
+                        <button type="button" class="dash-side-link" data-target="dash-notifications">Notifications</button>
+                        <button type="button" class="dash-side-link" data-target="dash-profile">Profile</button>
+                        <button type="button" class="dash-side-link" data-target="dash-payment-methods">Payment methods</button>
+                        <button type="button" class="dash-side-link" data-target="dash-security">Security</button>
+                    </div>
                 </details>
-                <button type="button" class="dash-side-link" data-target="sec-bookings">Your bookings</button>
-                {% if is_staff or is_admin %}
-                <button type="button" class="dash-side-link" data-target="sec-admin-bookings">All bookings (admin)</button>
-                {% endif %}
-                <button type="button" class="dash-side-link" data-target="dash-notifications">Notifications</button>
-                <button type="button" class="dash-side-link" data-target="dash-profile">Profile</button>
-                <button type="button" class="dash-side-link" data-target="dash-payment-methods">Payment methods</button>
-                <button type="button" class="dash-side-link" data-target="dash-security">Security</button>
                 {% if is_staff %}
-                <p class="dash-side-group-label">Operations</p>
-                <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
-                <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
-                <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
-                <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
-                <details class="dash-advanced">
+                <details class="dash-mobile-group" open>
+                    <summary>Operations</summary>
+                    <div class="dash-mobile-links">
+                        <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
+                        <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
+                        <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
+                        <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
+                    </div>
+                </details>
+                <details class="dash-mobile-group dash-advanced-group" open>
                     <summary>Advanced tools</summary>
-                    <button type="button" class="dash-side-link" data-target="sec-fleet">Add vehicle</button>
-                    <button type="button" class="dash-side-link" data-target="dash-renter-reviews">Renter reviews</button>
-                    <button type="button" class="dash-side-link" data-target="sec-users">Manage users</button>
+                    <div class="dash-mobile-links">
+                        <button type="button" class="dash-side-link" data-target="sec-fleet">Add vehicle</button>
+                        <button type="button" class="dash-side-link" data-target="dash-renter-reviews">Renter reviews</button>
+                        <button type="button" class="dash-side-link" data-target="sec-users">Manage users</button>
+                    </div>
                 </details>
                 {% endif %}
             </aside>
@@ -1012,6 +1022,7 @@
         (function initDashboardSidebar() {
             const links = Array.from(document.querySelectorAll('.dash-side-link'));
             const panels = Array.from(document.querySelectorAll('.dashboard-panel'));
+            const mobileGroups = Array.from(document.querySelectorAll('.dash-mobile-group'));
             if (!links.length || !panels.length) return;
             const requestRows = Array.from(document.querySelectorAll('#dash-my-requests tbody tr[data-rr-status]'));
             const requestEmpty = document.getElementById('rr-empty-filtered');
@@ -1047,6 +1058,16 @@
             links.forEach((link) => {
                 link.addEventListener('click', () => {
                     showPanel(link.dataset.target, link.dataset.requestFilter || 'all');
+                });
+            });
+
+            mobileGroups.forEach((group) => {
+                group.addEventListener('toggle', () => {
+                    if (!window.matchMedia('(max-width: 768px)').matches) return;
+                    if (!group.open) return;
+                    mobileGroups.forEach((other) => {
+                        if (other !== group) other.open = false;
+                    });
                 });
             });
 

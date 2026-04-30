@@ -77,3 +77,22 @@
         margin: 20px;
     }
 }
+
+@media (max-width: 480px) {
+    .about-hero {
+        padding: 40px 12px 24px;
+    }
+
+    .about-section,
+    .contact-section {
+        padding: 24px 14px;
+        margin: 14px 10px;
+        border-radius: 14px;
+    }
+
+    .about-section p,
+    .contact-section p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+}

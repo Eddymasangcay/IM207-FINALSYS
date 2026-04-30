@@ -790,3 +790,59 @@ body.ck-page-fleet .cards {
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 640px) {
+    .page-hero {
+        padding: 40px 14px 24px;
+    }
+
+    .fleet-toolbar-sticky {
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .fleet-search {
+        gap: 8px;
+    }
+
+    .fleet-search input[type="search"],
+    .fleet-search input[type="text"],
+    .fleet-search input[type="date"],
+    .fleet-search button {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .cards {
+        padding: 0 12px 40px;
+        gap: 14px;
+    }
+
+    .card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .fleet-card-media {
+        margin: -14px -14px 0;
+    }
+
+    .fleet-modal-inner {
+        padding: 16px 14px 14px;
+    }
+
+    .fleet-modal-actions,
+    .fleet-modal-book {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .fleet-modal-book .qty-input,
+    .fleet-modal-book .btn,
+    .fleet-modal-actions .btn,
+    .fleet-modal-actions .ck-btn {
+        width: 100%;
+    }
+}

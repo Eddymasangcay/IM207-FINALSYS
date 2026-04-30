@@ -477,6 +477,37 @@
     }
 }
 
+@media (max-width: 480px) {
+    .home-hero {
+        padding: 34px 16px 44px;
+    }
+
+    .home-hero h1 {
+        font-size: 2rem;
+    }
+
+    .home-hero .lead {
+        font-size: 0.95rem;
+        margin-bottom: 22px;
+    }
+
+    .home-hero-actions {
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .btn-primary-lg,
+    .btn-ghost-lg {
+        width: 100%;
+        padding: 12px 16px;
+    }
+
+    .home-book-panel {
+        border-radius: 16px;
+        padding: 18px 14px;
+    }
+}
+
 /* ===== Promo popup (adapted from premium popup pattern) ===== */
 
 .ck-promo .catalog-premium-popup-overlay,
