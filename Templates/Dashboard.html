@@ -1180,11 +1180,14 @@
 
                 function clampPos(x, y) {
                     const rect = drawerToggle.getBoundingClientRect();
+                    const header = document.querySelector('.site-header');
+                    const headerBottom = header ? header.getBoundingClientRect().bottom : 60;
+                    const minY = Math.max(8, Math.round(headerBottom + 8));
                     const maxX = window.innerWidth - rect.width - 8;
                     const maxY = window.innerHeight - rect.height - 8;
                     return {
                         x: Math.max(8, Math.min(x, maxX)),
-                        y: Math.max(8, Math.min(y, maxY)),
+                        y: Math.max(minY, Math.min(y, maxY)),
                     };
                 }
 
