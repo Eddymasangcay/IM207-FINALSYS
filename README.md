@@ -44,17 +44,48 @@ It includes core modules for customer booking, vehicle management, payment proce
 
 ## 👨‍💻 Developer
 
+## 👨‍💻 Developers
+
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="100" height="100" style="border-radius: 50%;"/>
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" style="border-radius: 50%;" />
       <br />
-      <strong>Eduardo D. Masangcay</strong>
+      <strong>Eduardo D. Masangcay (Me)</strong>
       <br />
-      <em>BSIT - 2E</em>
-      <br />
-      <em>St. Cecilia's College-Cebu, Inc.</em>
+      <em>Web Developer</em>
     </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" style="border-radius: 50%;" />
+      <br />
+      <strong>John Paul G. Natad</strong>
+      <br />
+      <em>Database Analyst</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" style="border-radius: 50%;" />
+      <br />
+      <strong>Jerkean C. Gabrina</strong>
+      <br />
+      <em>Assistant Database Analyst</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" style="border-radius: 50%;" />
+      <br />
+      <strong>John Peter B. Gale</strong>
+      <br />
+      <em>Documentator</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" style="border-radius: 50%;" />
+      <br />
+      <strong>Vince Gabriel Paquiabas</strong>
+      <br />
+      <em>Designer</em>
+    </td>
+    <td></td>
   </tr>
 </table>
 
