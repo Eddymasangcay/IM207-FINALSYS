@@ -41,11 +41,12 @@ def _load_local_env_file():
 
 _load_local_env_file()
 
-app = Flask(__name__, static_folder='.', static_url_path='/static', template_folder='templates')
+basedir = os.path.abspath(os.path.dirname(__file__))
+template_dir = 'templates' if os.path.isdir(os.path.join(basedir, 'templates')) else 'Templates'
+app = Flask(__name__, static_folder='.', static_url_path='/static', template_folder=template_dir)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
 
 # Set up database path - use Database folder
-basedir = os.path.abspath(os.path.dirname(__file__))
 database_folder = os.path.join(basedir, 'Database')
 os.makedirs(database_folder, exist_ok=True)
 
