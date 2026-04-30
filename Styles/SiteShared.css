@@ -136,6 +136,27 @@ a:focus-visible {
     color: var(--ck-accent);
 }
 
+.site-quick-links {
+    display: none;
+}
+
+.site-quick-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--ck-border);
+    background: var(--ck-elevated);
+}
+
+.site-quick-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--ck-text-soft);
+}
+
 .site-nav-toggle {
     display: none;
     flex-direction: column;
@@ -218,7 +239,7 @@ a:focus-visible {
         flex-shrink: 0;
         align-items: center;
         justify-content: center;
-        margin-left: auto;
+        margin-left: 0;
     }
 
     .site-nav {
@@ -245,10 +266,16 @@ a:focus-visible {
 
     .site-logo {
         font-size: 1rem;
-        max-width: calc(100% - 60px);
+        max-width: none;
         overflow: hidden;
         text-overflow: ellipsis;
         padding-right: 8px;
+    }
+
+    .site-quick-links {
+        display: inline-flex;
+        gap: 6px;
+        margin-left: auto;
     }
 
     .site-nav a {
@@ -262,6 +289,11 @@ a:focus-visible {
     .site-nav .nav-cta {
         justify-content: center;
         margin-top: 4px;
+    }
+
+    .site-nav .nav-link-home,
+    .site-nav .nav-link-about {
+        display: none;
     }
 }
 

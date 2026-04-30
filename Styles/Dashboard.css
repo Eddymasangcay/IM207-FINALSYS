@@ -1146,8 +1146,40 @@ body.ck-page-dashboard .dashboard {
 
 @media (max-width: 600px) {
     .profile-header {
-        flex-direction: column;
+        flex-direction: row;
         align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .profile-avatar {
+        width: 64px;
+        height: 64px;
+    }
+
+    .profile-intro {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .profile-intro h2 {
+        font-size: 1.65rem;
+        line-height: 1.2;
+        margin-bottom: 4px;
+        word-break: break-word;
+    }
+
+    .profile-sub {
+        font-size: 0.9rem;
+        line-height: 1.45;
+    }
+
+    .welcome {
+        padding: 18px 14px;
+    }
+
+    .stat-cards {
+        grid-template-columns: 1fr;
     }
 }
 
