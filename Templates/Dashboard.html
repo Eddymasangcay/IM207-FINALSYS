@@ -1120,8 +1120,13 @@
 
             mobileGroups.forEach((group) => {
                 group.addEventListener('toggle', () => {
-                    if (!isMobile()) return;
                     if (!group.open) return;
+                    if (!isMobile()) {
+                        mobileGroups.forEach((other) => {
+                            if (other !== group) other.open = false;
+                        });
+                        return;
+                    }
                     mobileGroups.forEach((other) => {
                         if (other !== group) other.open = false;
                     });
@@ -1150,14 +1155,13 @@
             function syncTopGroupsByViewport() {
                 if (!mobileGroups.length) return;
                 if (isMobile()) {
-                    mobileGroups.forEach((group, idx) => {
-                        group.open = idx === 0;
+                    mobileGroups.forEach((group) => {
+                        group.open = false;
                     });
                     return;
                 }
-                // Keep top dashboard groups visible on desktop.
                 mobileGroups.forEach((group) => {
-                    group.open = true;
+                    group.open = false;
                 });
             }
 
