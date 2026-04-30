@@ -1129,6 +1129,7 @@
                 if (!drawerPanel || !drawerBackdrop || !drawerToggle) return;
                 drawerPanel.classList.toggle('is-open', !!open);
                 drawerBackdrop.hidden = !open;
+                drawerBackdrop.classList.toggle('is-visible', !!open);
                 document.body.classList.toggle('ck-dash-drawer-open', !!open);
                 drawerToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
             }
@@ -1185,7 +1186,67 @@
             }
 
             if (drawerToggle) {
+                let dragging = false;
+                let moved = false;
+                let startX = 0;
+                let startY = 0;
+                let offsetX = 0;
+                let offsetY = 0;
+                let lastX = 0;
+                let lastY = 0;
+
+                function clampPos(x, y) {
+                    const rect = drawerToggle.getBoundingClientRect();
+                    const maxX = window.innerWidth - rect.width - 8;
+                    const maxY = window.innerHeight - rect.height - 8;
+                    return {
+                        x: Math.max(8, Math.min(x, maxX)),
+                        y: Math.max(8, Math.min(y, maxY)),
+                    };
+                }
+
+                function applyPos(x, y) {
+                    const clamped = clampPos(x, y);
+                    lastX = clamped.x;
+                    lastY = clamped.y;
+                    drawerToggle.style.left = `${clamped.x}px`;
+                    drawerToggle.style.top = `${clamped.y}px`;
+                    drawerToggle.style.right = 'auto';
+                }
+
+                function startDrag(clientX, clientY) {
+                    const rect = drawerToggle.getBoundingClientRect();
+                    dragging = true;
+                    moved = false;
+                    startX = clientX;
+                    startY = clientY;
+                    offsetX = clientX - rect.left;
+                    offsetY = clientY - rect.top;
+                }
+
+                function moveDrag(clientX, clientY) {
+                    if (!dragging) return;
+                    if (Math.abs(clientX - startX) > 4 || Math.abs(clientY - startY) > 4) moved = true;
+                    applyPos(clientX - offsetX, clientY - offsetY);
+                }
+
+                function endDrag() {
+                    dragging = false;
+                }
+
+                drawerToggle.addEventListener('pointerdown', (ev) => {
+                    startDrag(ev.clientX, ev.clientY);
+                    drawerToggle.setPointerCapture(ev.pointerId);
+                });
+                drawerToggle.addEventListener('pointermove', (ev) => moveDrag(ev.clientX, ev.clientY));
+                drawerToggle.addEventListener('pointerup', () => endDrag());
+                drawerToggle.addEventListener('pointercancel', () => endDrag());
+
                 drawerToggle.addEventListener('click', () => {
+                    if (moved) {
+                        moved = false;
+                        return;
+                    }
                     const currentlyOpen = drawerPanel && drawerPanel.classList.contains('is-open');
                     setDrawerState(!currentlyOpen);
                 });
