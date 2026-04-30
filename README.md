@@ -1,4 +1,4 @@
-# IM207 Final System
+# Chukakoy Car Rental System
 
 <div align="center">
 
@@ -15,7 +15,7 @@
 
 ## 📌 Overview
 
-****Chukakoy Car Rental System** is a web-based academic project developed to streamline and modernize day-to-day car rental operations.  
+**Chukakoy Car Rental System** is a web-based academic project developed to streamline and modernize day-to-day car rental operations.  
 The system is designed to provide a smoother experience for both customers and administrators by combining booking management, vehicle tracking, and payment processing in one platform.
 
 For customers, the platform offers an accessible way to browse available vehicles, select preferred rental schedules, and complete reservations online.  
