@@ -142,14 +142,14 @@ Experience the deployed system here:
     </td>
   </tr>
   <tr>
-    <td align="center">
+    <td align="center" colspan="2">
       <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
       <br />
       <strong>John Peter B. Gale</strong>
       <br />
       <em>Documentator</em>
     </td>
-    <td align="center">
+    <td align="center" colspan="1">
       <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
       <br />
       <strong>Vince Gabriel Paquiabas</strong>
