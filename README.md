@@ -48,6 +48,15 @@ Overall, Chukakoy Car Rental System serves as a practical and user-focused solut
 
 ---
 
+## 🗂️ Entity-Relationship Diagram (ERD)
+
+> 📌 **Database Architecture Reference**  
+> The complete Entity-Relationship Diagram for this project is available in Figma.  
+>  
+> 🔗 [Chukakoy Car Rental - ERD Board](https://www.figma.com/board/t3X2NkmHzongN0VsYPoC4D/Chukakoy-Car-Rental---Entity-Relationship-Diagram?node-id=0-1&t=pq38QzFM8nLPN6Wv-1)
+> 
+---
+
 ## 👨‍💻 Developers
 
 <table>
