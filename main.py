@@ -315,7 +315,7 @@ def _absolute_url_for(endpoint: str, **values) -> str:
 
 
 def _paymongo_default_payment_method_types() -> list:
-    raw = (os.environ.get('PAYMONGO_PAYMENT_METHOD_TYPES') or 'card,gcash,paymaya').strip()
+    raw = (os.environ.get('PAYMONGO_PAYMENT_METHOD_TYPES') or 'card,gcash,paymaya,grab_pay,shopee_pay').strip()
     return [p.strip() for p in raw.split(',') if p.strip()]
 
 
@@ -2589,14 +2589,6 @@ def process_payment():
             flash('Invalid checkout session.', 'error')
             return redirect(url_for('dashboard'))
 
-    allowed_methods = frozenset(
-        {'gcash', 'paymaya', 'credit_card', 'debit_card', 'paypal', 'cash', 'paymongo'}
-    )
-    payment_method = request.form.get('payment_method', '').strip().lower()
-    if payment_method not in allowed_methods:
-        flash('Please choose a valid payment method.', 'error')
-        return redirect(url_for('payment'))
-
     pay_currency = request.form.get('pay_currency', 'PHP').strip().upper()
     if pay_currency not in ('PHP', 'USD'):
         pay_currency = 'PHP'
@@ -2605,30 +2597,9 @@ def process_payment():
         flash('Please enter a delivery address for the vehicle.', 'error')
         return redirect(url_for('payment'))
     pending['delivery_address'] = delivery_address
-
-    if payment_method == 'paymongo':
-        return _paymongo_begin_hosted_checkout()
-
-    if payment_method == 'gcash':
-        flash('For GCash, use â€œContinue to GCash QRâ€, scan the code, then confirm payment.', 'error')
-        return redirect(url_for('payment'))
-
-    if payment_method in ('credit_card', 'debit_card'):
-        card_no = request.form.get('card_number', '').replace(' ', '').strip()
-        expiry = request.form.get('expiry', '').strip()
-        cvv = request.form.get('cvv', '').strip()
-        if len(card_no) < 12 or not expiry or len(cvv) < 3:
-            flash('Please enter valid card number, expiry, and CVV for card payments.', 'error')
-            return redirect(url_for('payment'))
-
-    try:
-        booking = _create_paid_booking(current_user, pending, payment_method, pay_currency)
-    except ValueError as exc:
-        flash(str(exc), 'error')
-        return redirect(url_for('payment'))
-    _finalize_rental_request_after_payment(booking)
-    session.pop('pending_booking', None)
-    return redirect(url_for('receipt', booking_id=booking.id))
+    session['pending_booking'] = pending
+    session.modified = True
+    return _paymongo_begin_hosted_checkout()
 
 @app.route('/receipt/<int:booking_id>')
 def receipt(booking_id):

@@ -12,7 +12,7 @@ Set these in the Railway service variables panel:
 - `PAYMONGO_WEBHOOK_SECRET` (`whsk_...`)
 - `PUBLIC_APP_URL` (`https://your-domain.com`)
 - `FLASK_SECRET_KEY` (new random secret)
-- `PAYMONGO_PAYMENT_METHOD_TYPES` (for example: `card,gcash,paymaya`)
+- `PAYMONGO_PAYMENT_METHOD_TYPES` (for example: `card,gcash,paymaya,grab_pay,shopee_pay`)
 - `USD_TO_PHP_RATE` (for example: `56.0`)
 
 ## 3) Runtime/startup
