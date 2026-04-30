@@ -109,7 +109,7 @@ Create a `.env` file in the project root, then add:
 ## 🌐 Live Demo
 
 Experience the deployed system here:  
-🔗 [Chukakoy Car Rental System (Railway)](https://your-railway-app-url.up.railway.app)
+🔗 [Chukakoy Car Rental System (Railway)](https://chukakoycars.up.railway.app/)
 
 ---
 
