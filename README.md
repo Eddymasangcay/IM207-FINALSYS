@@ -42,8 +42,6 @@ It includes core modules for customer booking, vehicle management, payment proce
 
 ---
 
-## 👨‍💻 Developer
-
 ## 👨‍💻 Developers
 
 <table>
@@ -85,7 +83,6 @@ It includes core modules for customer booking, vehicle management, payment proce
       <br />
       <em>Designer</em>
     </td>
-    <td></td>
   </tr>
 </table>
 
