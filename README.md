@@ -115,11 +115,51 @@ Experience the deployed system here:
 
 ## 👨‍💻 Developers
 
-- **Eduardo D. Masangcay (Me)** — Web Developer  
-- **John Paul G. Natad** — Database Analyst  
-- **Jerkean C. Gabrina** — Assistant Database Analyst  
-- **John Peter B. Gale** — Documentator  
-- **Vince Gabriel Paquiabas** — Designer  
+<div align="center">
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>Eduardo D. Masangcay (Me)</strong>
+      <br />
+      <em>Web Developer</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>John Paul G. Natad</strong>
+      <br />
+      <em>Database Analyst</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>Jerkean C. Gabrina</strong>
+      <br />
+      <em>Assistant Database Analyst</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>John Peter B. Gale</strong>
+      <br />
+      <em>Documentator</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>Vince Gabriel Paquiabas</strong>
+      <br />
+      <em>Designer</em>
+    </td>
+  </tr>
+</table>
+
+</div>
 
 ---
 
