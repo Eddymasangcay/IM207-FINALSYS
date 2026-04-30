@@ -1,0 +1,252 @@
+﻿{% extends "base.html" %}
+{% block title %}Damage reports â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/DamageReports.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-dashboard{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    <div class="dashboard dr-page ck-container">
+        <div class="welcome">
+            <h2>Damage reports</h2>
+            {% if can_view_all_damages %}
+            <p>All logged vehicle damage across the fleet. Use <strong>View</strong> to open the full record.</p>
+            {% else %}
+            <p>Your visible damage history only (records linked to your rentals/account).</p>
+            {% endif %}
+            <p class="muted"><a href="{{ url_for('dashboard') }}">Back to dashboard</a></p>
+        </div>
+
+        {% if damages %}
+        <div class="post-form dr-kpi-row">
+            <div class="dr-kpi-card"><span>Total reports</span><strong>{{ damages|length }}</strong></div>
+            <div class="dr-kpi-card"><span>Open cases</span><strong>{{ damages|selectattr('is_resolved', 'equalto', False)|list|length }}</strong></div>
+            <div class="dr-kpi-card"><span>Resolved</span><strong>{{ damages|selectattr('is_resolved', 'equalto', True)|list|length }}</strong></div>
+        </div>
+
+        <div class="post-form dr-summary">
+            <h3>Damage count by vehicle</h3>
+            <div class="dr-summary-list">
+                {% for vehicle_name, count in vehicle_damage_counts %}
+                <div class="dr-summary-item">
+                    <span>{{ vehicle_name }}</span>
+                    <strong>{{ count }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dr-table-wrap post-form">
+            <div class="dr-filter-row">
+                <div class="dr-filter-group">
+                    <label for="dr-filter-vehicle">Filter by vehicle</label>
+                    <select id="dr-filter-vehicle">
+                        <option value="">All vehicles</option>
+                        {% for vehicle_name, count in vehicle_damage_counts %}
+                        <option value="{{ vehicle_name }}">{{ vehicle_name }} ({{ count }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="dr-filter-group">
+                    <label for="dr-filter-severity">Severity</label>
+                    <select id="dr-filter-severity">
+                        <option value="">All severities</option>
+                        <option value="minor">Minor</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="major">Major</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            <table class="dr-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Responsible user/party</th>
+                        <th>Status</th>
+                        <th>Severity</th>
+                        <th>Resolution</th>
+                        <th>Area</th>
+                        <th>Summary</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in damages %}
+                    <tr data-vehicle="{{ d.vehicle.name if d.vehicle else 'â€”' }}" data-severity="{{ d.severity or 'moderate' }}">
+                        <td>{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ d.vehicle.name if d.vehicle else 'â€”' }}</td>
+                        <td>
+                            {% if d.responsible_party %}
+                                {{ d.responsible_party }}
+                            {% elif d.booking and d.booking.user %}
+                                {{ d.booking.user.username }}
+                            {% else %}
+                                â€”
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set wf = d.workflow_status %}
+                            <span class="dr-workflow-pill dr-workflow-{{ wf }}">{{ wf|replace('_', ' ')|title }}</span>
+                        </td>
+                        <td><span class="dr-severity dr-severity-{{ d.severity or 'moderate' }}">{{ (d.severity or 'moderate')|title }}</span></td>
+                        <td>
+                            {% if d.is_resolved %}
+                            <span class="dr-resolution-pill dr-resolution-resolved">Resolved</span>
+                            {% else %}
+                            <span class="dr-resolution-pill dr-resolution-open">Open</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ d.area_on_vehicle }}</td>
+                        <td class="dr-clip">{{ (d.damage_description or '')[:80] }}{% if (d.damage_description or '')|length > 80 %}â€¦{% endif %}</td>
+                        <td>
+                            {% if can_view_all_damages %}
+                            <button type="button" class="btn-secondary-outline btn-sm dr-open-status" data-target="dr-status-dlg-{{ d.id }}">Update</button>
+                            {% endif %}
+                            <button type="button" class="btn btn-sm dr-open" data-target="dr-dlg-{{ d.id }}">View</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p id="dr-empty-filtered" class="muted dr-empty-filtered" hidden>No records match your selected filters.</p>
+        </div>
+
+        {% for d in damages %}
+        {% if can_view_all_damages %}
+        <dialog class="dr-dialog dr-status-dialog" id="dr-status-dlg-{{ d.id }}">
+            <div class="dr-dialog-inner">
+                <button type="button" class="fleet-modal-close dr-dialog-x" aria-label="Close" data-close="dr-status-dlg-{{ d.id }}">&times;</button>
+                <h3>Update damage status</h3>
+                <p class="dr-meta">Damage #{{ d.id }} Â· {{ d.vehicle.name if d.vehicle else 'Unknown vehicle' }}</p>
+                <form action="{{ url_for('staff_update_damage_status', damage_id=d.id) }}" method="POST" class="dr-status-modal-form">
+                    {{ csrf_input()|safe }}
+                    {% set wf = d.workflow_status %}
+                    <label class="field-label" for="dr-status-{{ d.id }}">Workflow status</label>
+                    <select id="dr-status-{{ d.id }}" name="damage_status" required>
+                        {% for st in damage_workflow_statuses %}
+                        <option value="{{ st }}" {% if wf == st %}selected{% endif %}>{{ st|replace('_', ' ')|title }}</option>
+                        {% endfor %}
+                    </select>
+                    <label class="field-label" for="dr-resolution-{{ d.id }}">Resolution status</label>
+                    <select id="dr-resolution-{{ d.id }}" name="resolution_status" required>
+                        <option value="open" {% if not d.is_resolved %}selected{% endif %}>Open</option>
+                        <option value="resolved" {% if d.is_resolved %}selected{% endif %}>Resolved</option>
+                    </select>
+                    <div class="dr-status-modal-actions">
+                        <button type="submit" class="btn btn-sm">Save status</button>
+                        <button type="button" class="btn-secondary-outline btn-sm" data-close="dr-status-dlg-{{ d.id }}">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+        {% endif %}
+
+        <dialog class="dr-dialog" id="dr-dlg-{{ d.id }}">
+            <div class="dr-dialog-inner">
+                <button type="button" class="fleet-modal-close dr-dialog-x" aria-label="Close" data-close="dr-dlg-{{ d.id }}">&times;</button>
+                <h3>Damage #{{ d.id }}</h3>
+                <p class="dr-meta">{{ d.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</p>
+                <dl class="dr-dl">
+                    <dt>Vehicle</dt>
+                    <dd>{{ d.vehicle.name if d.vehicle else 'â€”' }} {% if d.vehicle %}({{ region_label(d.vehicle.region) }}){% endif %}</dd>
+                    <dt>Area on vehicle</dt>
+                    <dd>{{ d.area_on_vehicle }}</dd>
+                    <dt>Damage detail</dt>
+                    <dd class="dr-detail">{{ d.damage_description }}</dd>
+                    <dt>Severity</dt>
+                    <dd>{{ (d.severity or 'moderate')|title }}</dd>
+                    <dt>Resolution</dt>
+                    <dd>{% if d.is_resolved %}Resolved{% else %}Open{% endif %}</dd>
+                    <dt>Estimated repair cost</dt>
+                    <dd>{% if d.repair_estimate_usd is not none %}${{ '%.2f' % d.repair_estimate_usd }}{% else %}â€”{% endif %}</dd>
+                    <dt>Responsible party</dt>
+                    <dd>{{ d.responsible_party or 'â€”' }}</dd>
+                    <dt>Linked booking</dt>
+                    <dd>
+                        {% if d.booking_id %}
+                            #{{ d.booking_id }}
+                            {% if d.booking and d.booking.user %}
+                                Â· Customer: {{ d.booking.user.username }}
+                            {% endif %}
+                        {% else %}
+                            â€”
+                        {% endif %}
+                    </dd>
+                    <dt>Logged by</dt>
+                    <dd>{% if d.reporter %}{{ d.reporter.username }}{% else %}â€”{% endif %}</dd>
+                </dl>
+                {% if d.booking_id %}
+                <p class="dr-actions"><a class="btn btn-sm" href="{{ url_for('booking_track', booking_id=d.booking_id) }}">Open rental track</a></p>
+                {% endif %}
+                <button type="button" class="btn-secondary-outline dr-close-bottom" data-close="dr-dlg-{{ d.id }}">Close</button>
+            </div>
+        </dialog>
+        {% endfor %}
+
+        {% else %}
+        <div class="post-form"><p class="muted">No damage records yet.</p></div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block body_script %}
+    <script>
+        (function () {
+            function closeId(id) {
+                var el = document.getElementById(id);
+                if (el && typeof el.close === "function") el.close();
+            }
+            document.querySelectorAll(".dr-open").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var id = btn.getAttribute("data-target");
+                    var dlg = document.getElementById(id);
+                    if (dlg && typeof dlg.showModal === "function") dlg.showModal();
+                });
+            });
+            document.querySelectorAll(".dr-open-status").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var id = btn.getAttribute("data-target");
+                    var dlg = document.getElementById(id);
+                    if (dlg && typeof dlg.showModal === "function") dlg.showModal();
+                });
+            });
+            document.querySelectorAll("[data-close]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    closeId(btn.getAttribute("data-close"));
+                });
+            });
+            document.querySelectorAll(".dr-dialog").forEach(function (dlg) {
+                dlg.addEventListener("click", function (ev) {
+                    if (ev.target === dlg) dlg.close();
+                });
+            });
+            var vehicleFilter = document.getElementById("dr-filter-vehicle");
+            var severityFilter = document.getElementById("dr-filter-severity");
+            function applyTableFilters() {
+                var selectedVehicle = vehicleFilter ? vehicleFilter.value : "";
+                var selectedSeverity = severityFilter ? severityFilter.value : "";
+                var shown = 0;
+                document.querySelectorAll(".dr-table tbody tr").forEach(function (row) {
+                    var matchesVehicle = !selectedVehicle || row.getAttribute("data-vehicle") === selectedVehicle;
+                    var matchesSeverity = !selectedSeverity || row.getAttribute("data-severity") === selectedSeverity;
+                    var visible = (matchesVehicle && matchesSeverity);
+                    row.style.display = visible ? "" : "none";
+                    if (visible) shown += 1;
+                });
+                var emptyEl = document.getElementById("dr-empty-filtered");
+                if (emptyEl) emptyEl.hidden = shown !== 0;
+            }
+            if (vehicleFilter) {
+                vehicleFilter.addEventListener("change", applyTableFilters);
+            }
+            if (severityFilter) {
+                severityFilter.addEventListener("change", applyTableFilters);
+            }
+        })();
+    </script>
+{% endblock %}
+

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}{{ site_brand }} — Drive your next trip{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Homepage.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-home{% endblock %}
+
+{% block content %}
+    <section class="home-hero" id="home">
+        <div class="home-hero-inner">
+            <div>
+                <p class="home-kicker">{{ site_brand }}</p>
+                <h1>Premium wheels. Straight-through booking.</h1>
+                <p class="lead">Choose pickup and return dates on the fleet page—each card shows live availability before you reserve.</p>
+                <div class="home-hero-actions">
+                    <a class="btn-primary-lg" href="{{ url_for('transportations') }}">Browse fleet</a>
+                    <a class="btn-ghost-lg" href="{{ url_for('aboutpage') }}">Why us</a>
+                </div>
+                <div class="home-stats" aria-label="Highlights">
+                    <div class="home-stat">
+                        <strong>{{ fleet_count }}+</strong>
+                        <span>Vehicles listed</span>
+                    </div>
+                    <div class="home-stat">
+                        <strong>24/7</strong>
+                        <span>Online booking</span>
+                    </div>
+                    <div class="home-stat">
+                        <strong>100%</strong>
+                        <span>Secure checkout</span>
+                    </div>
+                </div>
+            </div>
+            <div class="home-book-panel" id="book">
+                <h2>Plan your trip</h2>
+                <p class="sub">We carry your dates to the fleet—vehicles show <strong>Available</strong> or <strong>Unavailable</strong> for that range.</p>
+                <form action="{{ url_for('transportations') }}" method="get">
+                    <div class="home-book-grid">
+                        <label>Pick-up location
+                            <input type="text" name="location" placeholder="City or branch" autocomplete="off">
+                        </label>
+                        <label>Car type
+                            <select name="q" aria-label="Filter by vehicle name">
+                                <option value="">Any vehicle</option>
+                                {% for t in fleet_names %}
+                                <option value="{{ t }}">{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>Pick-up date
+                            <input type="date" name="pickup_date" min="{{ today_iso }}">
+                        </label>
+                        <label>Return date
+                            <input type="date" name="return_date" min="{{ today_iso }}">
+                        </label>
+                    </div>
+                    <div class="home-book-actions">
+                        <button class="btn-primary-lg" type="submit">Search cars</button>
+                        <p class="home-book-hint">Sign in after you pick a vehicle to complete terms, ID, and payment.</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="why">
+        <div class="section-head">
+            <h2>Why choose {{ site_brand }}?</h2>
+            <p>Everything you expect from a modern rental desk—online, fast, and dependable.</p>
+        </div>
+        <div class="feature-grid">
+            <article class="feature-card">
+                <h3>24/7 self‑service</h3>
+                <p>Browse vehicles, reserve, and pay on your schedule—no waiting on hold.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Live availability</h3>
+                <p>Pick dates first; the fleet highlights units that are already booked for your window.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Clear, upfront pricing</h3>
+                <p>Daily rates are shown before you confirm—no surprise fees at checkout.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Curated fleet</h3>
+                <p>Economy to luxury—pick the vehicle class that matches your trip.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Guided rental flow</h3>
+                <p>Terms, ID verification, staff approval, then pay—mirrors professional rental operations.</p>
+            </article>
+            <article class="feature-card">
+                <h3>Staff‑ready operations</h3>
+                <p>Admins and staff can approve requests, manage pricing, review damage logs, and oversee compliance.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section" id="fleet" style="padding-top: 0;">
+        <div class="section-head">
+            <h2>Featured from our fleet</h2>
+            <p>Hand‑picked listings from your live inventory.</p>
+        </div>
+        <div class="fleet-grid">
+            {% for car in featured_transports %}
+            {% set feat_img = vehicle_image_url(car) %}
+            <article class="fleet-card">
+                {% if feat_img %}
+                <img src="{{ feat_img }}" alt="{{ car.name }}">
+                {% elif car.image_url %}
+                <img src="{{ car.image_url }}" alt="{{ car.name }}">
+                {% else %}
+                <div class="fleet-placeholder" role="img" aria-label="{{ car.name }}"></div>
+                {% endif %}
+                <div class="body">
+                    <h3>{{ car.name }}</h3>
+                    <div class="fleet-meta">
+                        <span>Verified listing</span>
+                        <span>Instant quote</span>
+                    </div>
+                    <div class="fleet-price">
+                        <strong>${{ '%.2f' % car.price }}<small style="font-weight:700;color:#64748b;font-size:0.75rem"> /day</small></strong>
+                        {% if session.get('username') %}
+                        <a href="{{ url_for('vehicle_detail', vehicle_id=car.id) }}">View &amp; book</a>
+                        {% else %}
+                        <a href="{{ url_for('loginpage') }}">Login to book</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% else %}
+            <p style="grid-column:1/-1;text-align:center;color:#64748b;">No vehicles yet—ask an admin to publish the fleet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-head">
+            <h2>How it works</h2>
+            <p>Six clear steps from browsing to confirmation.</p>
+        </div>
+        <div class="steps">
+            <article class="step-card" data-step="1">
+                <h3>Choose your car</h3>
+                <p>Open the fleet, set dates, and compare availability and daily rates.</p>
+            </article>
+            <article class="step-card" data-step="2">
+                <h3>Accept rental terms</h3>
+                <p>Review and agree to terms before uploading ID.</p>
+            </article>
+            <article class="step-card" data-step="3">
+                <h3>Upload your ID</h3>
+                <p>Submit a valid ID so staff can verify your request.</p>
+            </article>
+            <article class="step-card" data-step="4">
+                <h3>Staff review</h3>
+                <p>Wait for approval on your dashboard—your reservation reference is listed there.</p>
+            </article>
+            <article class="step-card" data-step="5">
+                <h3>Pay &amp; confirm</h3>
+                <p>After approval, complete payment and receive your receipt.</p>
+            </article>
+            <article class="step-card" data-step="6">
+                <h3>Track &amp; drive</h3>
+                <p>Use booking track and your dashboard for pickup details and history.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section testimonials">
+        <div class="section-head">
+            <h2>What renters say</h2>
+            <p>Feedback from customers who booked through {{ site_brand }}.</p>
+        </div>
+        <div class="testimonial-grid">
+            <article class="testimonial-card">
+                <p>“Booking took under five minutes. The receipt in my dashboard made pickup effortless.”</p>
+                <div class="who">Aira M.</div>
+                <div class="role">Weekend trip, Cebu</div>
+            </article>
+            <article class="testimonial-card">
+                <p>“Fleet photos matched what we got. Pricing was clear before we paid—huge plus.”</p>
+                <div class="who">Jordan P.</div>
+                <div class="role">Family SUV rental</div>
+            </article>
+            <article class="testimonial-card">
+                <p>“Loved the plate number on the receipt. Felt official and easy to trace.”</p>
+                <div class="who">Sam L.</div>
+                <div class="role">Business traveler</div>
+            </article>
+        </div>
+    </section>
+
+    <section class="cta-band" id="cta">
+        <h2>Ready when you are</h2>
+        <p>Create an account to book, track payments, and manage your rentals in one place.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
+            <a class="btn-primary-lg" href="{{ url_for('registerpage') }}">Create account</a>
+            <a class="btn-ghost-lg" href="{{ url_for('transportations') }}" style="color:#e2e8f0;border-color:rgba(148,163,184,0.35);">View fleet</a>
+        </div>
+    </section>
+
+    <div id="ck-promo" class="ck-promo" aria-hidden="true">
+        <div class="catalog-premium-popup-overlay" data-promo-dismiss></div>
+        <div class="catalog-premium-popup" role="dialog" aria-modal="true" aria-labelledby="promo-title">
+            <div class="catalog-premium-popup-content">
+                <button type="button" class="catalog-premium-popup-close-btn" data-promo-dismiss aria-label="Close promotion"></button>
+                <p class="catalog-premium-popup-title" id="promo-title">First ride bonus</p>
+                <div class="catalog-premium-popup-discount" aria-hidden="true">15%</div>
+                <p class="catalog-premium-popup-sub">Register and book this month—see fleet for live rates.</p>
+                <a class="catalog-premium-popup-btn" href="{{ url_for('registerpage') }}">Create account</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_script %}
+    <script>
+        (function () {
+            var root = document.getElementById("ck-promo");
+            if (!root) return;
+            var storageKey = "ck_promo_dismissed";
+            function openPromo() {
+                root.classList.add("is-open");
+                root.setAttribute("aria-hidden", "false");
+                document.body.classList.add("ck-promo-open");
+            }
+            function closePromo() {
+                root.classList.remove("is-open");
+                root.setAttribute("aria-hidden", "true");
+                document.body.classList.remove("ck-promo-open");
+                try {
+                    sessionStorage.setItem(storageKey, "1");
+                } catch (e) {}
+            }
+            if (!sessionStorage.getItem(storageKey)) {
+                requestAnimationFrame(function () {
+                    setTimeout(openPromo, 600);
+                });
+            }
+            root.querySelectorAll("[data-promo-dismiss]").forEach(function (el) {
+                el.addEventListener("click", closePromo);
+            });
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && root.classList.contains("is-open")) closePromo();
+            });
+        })();
+    </script>
+{% endblock %}

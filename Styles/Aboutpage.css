@@ -1,0 +1,79 @@
+.about-hero {
+    text-align: center;
+    padding: clamp(56px, 8vw, 96px) 20px 40px;
+    background: linear-gradient(160deg, #020617 0%, #0f172a 55%, #111827 100%);
+    color: #f1f5f9;
+}
+
+.about-hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.about-hero p {
+    margin: 0 auto;
+    max-width: 560px;
+    color: #94a3b8;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.about-section,
+.contact-section {
+    padding: 64px 40px;
+    text-align: center;
+    background: var(--ck-card);
+    margin: 40px auto;
+    max-width: 960px;
+    border-radius: 20px;
+    border: 1px solid var(--ck-border);
+    box-shadow: var(--ck-shadow-soft);
+}
+
+.about-section h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: var(--ck-text);
+    letter-spacing: -0.5px;
+}
+
+.about-section p {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--ck-text-soft);
+    line-height: 1.8;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-section h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: var(--ck-text);
+    letter-spacing: -0.5px;
+}
+
+.contact-section p {
+    font-size: 18px;
+    color: var(--ck-text-soft);
+    margin: 15px 0;
+    line-height: 1.8;
+}
+
+.contact-section p b {
+    color: var(--ck-accent-strong);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .about-section,
+    .contact-section {
+        padding: 40px 20px;
+        margin: 20px;
+    }
+}

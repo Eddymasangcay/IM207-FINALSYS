@@ -1,0 +1,76 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ transport.name }} â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Transportation.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-vehicle{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+{% set rental_step = 1 %}
+{% include 'partials/RentalStepper.html' %}
+
+<div class="ck-container vehicle-detail-wrap">
+    <div class="vehicle-detail-grid">
+        <div class="vehicle-detail-media ck-card-surface">
+            {% if vehicle_image %}
+            <img src="{{ vehicle_image }}" alt="{{ transport.name }}" class="vehicle-detail-img">
+            {% else %}
+            <div class="vehicle-detail-placeholder" role="img" aria-label="{{ transport.name }}"></div>
+            {% endif %}
+            <span class="region-pill region-pill--large">{{ region_label(transport.region) }}</span>
+        </div>
+        <div class="vehicle-detail-copy">
+            <p class="vehicle-detail-eyebrow">Fleet listing</p>
+            <h1 class="vehicle-detail-title">{{ transport.name }}</h1>
+            <p class="vehicle-detail-price"><strong>${{ '%.2f' % transport.price }}</strong> <span class="per">/ day</span></p>
+            {% if transport.description %}
+            <p class="vehicle-detail-desc">{{ transport.description }}</p>
+            {% endif %}
+            {% if transport.specs %}
+            <p class="vehicle-detail-specs">{{ transport.specs }}</p>
+            {% endif %}
+            <ul class="vehicle-detail-meta">
+                {% if transport.seats %}<li><span>Seats</span> {{ transport.seats }}</li>{% endif %}
+                {% if transport.fuel_type %}<li><span>Fuel</span> {{ transport.fuel_type|title }}</li>{% endif %}
+                {% if transport.transmission %}<li><span>Transmission</span> {{ transport.transmission|title }}</li>{% endif %}
+            </ul>
+
+            {% if has_date_filter %}
+            <p class="vehicle-detail-avail {% if available_for_dates %}is-ok{% else %}is-no{% endif %}">
+                {% if available_for_dates %}
+                Available for {{ search_pickup }} â†’ {{ search_return }}.
+                {% else %}
+                Not available for {{ search_pickup }} â†’ {{ search_return }}. Adjust dates on the fleet page or pick another vehicle.
+                {% endif %}
+            </p>
+            {% else %}
+            <p class="vehicle-detail-hint muted">Tip: open the <a href="{{ url_for('transportations') }}">fleet</a> and set pickup and return dates to see live availability before you book.</p>
+            {% endif %}
+
+            {% if session.get('username') %}
+            <form class="vehicle-detail-book ck-card-surface" method="post" action="{{ url_for('book_transportation', transportation_id=transport.id) }}">
+                {{ csrf_input()|safe }}
+                <h2 class="vehicle-detail-form-title">Reserve this vehicle</h2>
+                <div class="vehicle-detail-form-grid">
+                    <label>Pickup date
+                        <input type="date" name="pickup_date" value="{{ search_pickup or '' }}" min="{{ today_iso }}" required>
+                    </label>
+                    <label>Return date
+                        <input type="date" name="return_date" value="{{ search_return or '' }}" min="{{ today_iso }}" required>
+                    </label>
+                </div>
+                <p class="muted small">Billing days are counted inclusively on the calendar. You will confirm terms and ID on the next steps.</p>
+                <button type="submit" class="ck-btn ck-btn--primary vehicle-detail-submit" {% if has_date_filter and not available_for_dates %}disabled{% endif %}>Continue to rental agreement</button>
+            </form>
+            {% else %}
+            <p class="vehicle-detail-login"><a class="ck-btn ck-btn--primary" href="{{ url_for('loginpage') }}">Log in to book</a></p>
+            {% endif %}
+
+            <p class="vehicle-detail-back"><a href="{{ url_for('transportations') }}">â† Back to fleet</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

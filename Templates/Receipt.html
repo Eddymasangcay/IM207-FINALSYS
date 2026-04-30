@@ -1,0 +1,147 @@
+﻿{% extends "base.html" %}
+{% block title %}Receipt #{{ booking.id }} â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Receipt.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-receipt{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    {% set rental_step = 6 %}
+    {% include 'partials/RentalStepper.html' %}
+
+    <div class="dashboard receipt-page ck-container">
+        <div class="receipt-paper">
+            <header class="receipt-header">
+                <p class="receipt-brand">{{ site_brand }}</p>
+                <p class="receipt-sub">Rental receipt Â· Thank you for your business</p>
+                <div class="receipt-id-row">
+                    <span>Receipt #<strong>{{ '%06d' % booking.id }}</strong>
+                        <button type="button" class="ck-btn ck-btn--ghost ck-btn--sm" data-copy="{{ '%06d' % booking.id }}" data-label="Copy">Copy #</button>
+                    </span>
+                    <span>{{ booking.created_at.strftime('%b %d, %Y Â· %H:%M') }}</span>
+                </div>
+            </header>
+
+            <div class="receipt-body">
+                <div class="receipt-line"><span>Customer</span><span>
+                    {% if user.full_name %}{{ user.full_name }}{% else %}{{ user.username }}{% endif %}
+                </span></div>
+                {% if user.email %}<div class="receipt-line"><span>Email</span><span>{{ user.email }}</span></div>{% endif %}
+                <div class="receipt-line"><span>Booking ID</span><span>#{{ booking.id }}</span></div>
+                {% if booking.plate_number %}<div class="receipt-line"><span>Plate / unit</span><span>{{ booking.plate_number }}</span></div>{% endif %}
+                <div class="receipt-line"><span>Payment</span><span>
+                    {% if booking.payment_status == 'paid' %}Paid{% else %}{{ booking.payment_status|title }}{% endif %}
+                    {% if booking.payment_method %}
+                        Â· {% if booking.payment_method == 'gcash' %}GCash{% elif booking.payment_method == 'paymongo' %}PayMongo{% elif booking.payment_method == 'paymaya' %}PayMaya{% elif booking.payment_method == 'credit_card' %}Credit card{% elif booking.payment_method == 'debit_card' %}Debit card{% elif booking.payment_method == 'paypal' %}PayPal{% elif booking.payment_method == 'cash' %}Cash{% else %}{{ booking.payment_method }}{% endif %}
+                    {% endif %}
+                    {% if booking.pay_currency %} ({{ booking.pay_currency }}){% endif %}
+                </span></div>
+                <div class="receipt-line"><span>Payment reference</span><span>{{ payment_tx.reference if payment_tx and payment_tx.reference else 'Pending provider confirmation' }}</span></div>
+                {% if booking.delivery_address %}
+                <div class="receipt-line"><span>Delivery address</span><span>{{ booking.delivery_address }}</span></div>
+                {% endif %}
+                <div class="receipt-line"><span>Delivery received</span><span>
+                    {% if booking.delivery_received %}Yes{% else %}No{% endif %}
+                    {% if booking.delivery_received_at %} Â· {{ booking.delivery_received_at.strftime('%Y-%m-%d') }}{% endif %}
+                </span></div>
+                <div class="receipt-line"><span>Admin returned</span><span>
+                    {% if booking.delivery_returned %}Yes{% else %}No{% endif %}
+                    {% if booking.delivery_returned_at %} Â· {{ booking.delivery_returned_at.strftime('%Y-%m-%d') }}{% endif %}
+                </span></div>
+                <div class="receipt-line"><span>User returned</span><span>
+                    {% if booking.delivery_returned_by_user %}Yes{% else %}No{% endif %}
+                    {% if booking.delivery_returned_by_user_at %} Â· {{ booking.delivery_returned_by_user_at.strftime('%Y-%m-%d') }}{% endif %}
+                </span></div>
+                <div class="receipt-line"><span>Expected delivery</span><span>
+                    {% if booking.expected_delivery_at %}{{ booking.expected_delivery_at.strftime('%Y-%m-%d %H:%M') }}{% else %}â€”{% endif %}
+                </span></div>
+                <div class="receipt-line"><span>Actual delivery</span><span>
+                    {% if booking.actual_delivery_at %}{{ booking.actual_delivery_at.strftime('%Y-%m-%d %H:%M') }}{% else %}â€”{% endif %}
+                </span></div>
+                <div class="receipt-line"><span>Delivery delay</span><span>
+                    {% if booking.is_delivery_delayed %}
+                        Delayed by {{ booking.delivery_delay_minutes or 0 }} min{% if booking.delay_reason %} Â· {{ booking.delay_reason }}{% endif %}
+                    {% else %}
+                        On time
+                    {% endif %}
+                </span></div>
+                <div class="receipt-line"><span>Booking status</span><span>
+                    <span class="receipt-status-pill receipt-status-{{ (booking.booking_status or 'confirmed')|lower }}">
+                        {% if booking.booking_status == 'cancelled' %}Cancelled
+                        {% elif booking.delivery_returned %}Returned (admin)
+                        {% elif booking.delivery_returned_by_user %}Returned (you)
+                        {% else %}In-Delivery
+                        {% endif %}
+                    </span>
+                </span></div>
+
+                <div class="receipt-item-card">
+                    {% set img = vehicle_image_url(booking.transportation) %}
+                    {% if img %}
+                    <img class="receipt-item-img" src="{{ img }}" alt="{{ booking.transportation.name }}">
+                    {% else %}
+                    <div class="receipt-item-placeholder" role="img" aria-label="{{ booking.transportation.name }}"></div>
+                    {% endif %}
+                    <div class="receipt-item-details">
+                        <h4>{{ booking.transportation.name }}</h4>
+                        {% if booking.transportation.description %}
+                        <p class="desc">{{ booking.transportation.description }}</p>
+                        {% endif %}
+                        {% if booking.transportation.specs %}
+                        <p class="specs">{{ booking.transportation.specs }}</p>
+                        {% endif %}
+                        <p class="specs">Region: {{ region_label(booking.transportation.region) }}</p>
+                    </div>
+                </div>
+
+                <div class="receipt-pricing">
+                    <div class="receipt-pricing-row">
+                        <span>Daily rate</span>
+                        <span>${{ '%.2f' % booking.transportation.price }}</span>
+                    </div>
+                    <div class="receipt-pricing-row">
+                        <span>Rental days</span>
+                        <span>{{ booking.rental_days or booking.quantity }}</span>
+                    </div>
+                    <div class="receipt-pricing-row">
+                        <span>Subtotal</span>
+                        <span>${{ '%.2f' % (booking.transportation.price * (booking.rental_days or booking.quantity)) }}</span>
+                    </div>
+                    <div class="receipt-total">
+                        <span>Total paid</span>
+                        <span>${{ '%.2f' % booking.total_price }}</span>
+                    </div>
+                </div>
+
+                {% if booking.rental_start %}
+                <div class="receipt-line receipt-period-line"><span>Rental period</span><span>
+                    {{ booking.rental_start.strftime('%Y-%m-%d') }} â†’ {{ booking.rental_end.strftime('%Y-%m-%d') if booking.rental_end else 'â€”' }}
+                </span></div>
+                {% endif %}
+
+                <p class="receipt-footer-note">This document is an official rental payment acknowledgment. Keep this reference for support, changes, and claims processing.</p>
+            </div>
+        </div>
+
+        <div class="receipt-next ck-card-surface">
+            <h3 class="receipt-next-title">Whatâ€™s next</h3>
+            <ul class="receipt-next-list">
+                <li><strong>Pickup:</strong> Arrive during desk hours (demo: 8:00â€“18:00) with this receipt and a valid driver license.</li>
+                <li><strong>Branch:</strong> Chukakoy Plaza, Metro Cebu Â· <strong>Phone:</strong> +63 32 000 0000</li>
+                <li><strong>Track your rental:</strong> live map and dates stay on your booking page.</li>
+            </ul>
+            <div class="receipt-next-actions">
+                <a class="btn" href="{{ url_for('booking_track', booking_id=booking.id) }}">Open rental tracking</a>
+            </div>
+        </div>
+
+        <div class="receipt-actions receipt-actions-modern">
+            <a class="btn" href="{{ url_for('booking_track', booking_id=booking.id) }}">Track rental &amp; GPS</a>
+            <a class="btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class="btn-secondary-outline" href="{{ url_for('transportations') }}">Book another</a>
+        </div>
+    </div>
+{% endblock %}
+

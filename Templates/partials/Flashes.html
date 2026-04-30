@@ -1,0 +1,18 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="ck-flash-stack ck-container" role="region" aria-label="Notifications">
+    {% for category, message in messages %}
+    <div class="ck-flash ck-flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="ck-flash-stack ck-container" role="region" aria-label="Notifications">
+    {% for category, message in messages %}
+    <div class="ck-flash ck-flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}

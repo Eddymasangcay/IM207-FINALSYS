@@ -1,0 +1,12 @@
+{# Set rental_step (1–6) before including: Fleet, Terms, ID, Review, Pay, Done #}
+{% set rs = rental_step|default(1)|int %}
+<nav class="ck-stepper ck-container" aria-label="Booking progress">
+    <ol class="ck-stepper-track">
+        <li class="ck-step {% if rs > 1 %}is-done{% elif rs == 1 %}is-current{% endif %}"><span class="ck-step-num">1</span><span class="ck-step-label">Fleet</span></li>
+        <li class="ck-step {% if rs > 2 %}is-done{% elif rs == 2 %}is-current{% endif %}"><span class="ck-step-num">2</span><span class="ck-step-label">Terms</span></li>
+        <li class="ck-step {% if rs > 3 %}is-done{% elif rs == 3 %}is-current{% endif %}"><span class="ck-step-num">3</span><span class="ck-step-label">ID</span></li>
+        <li class="ck-step {% if rs > 4 %}is-done{% elif rs == 4 %}is-current{% endif %}"><span class="ck-step-num">4</span><span class="ck-step-label">Review</span></li>
+        <li class="ck-step {% if rs > 5 %}is-done{% elif rs == 5 %}is-current{% endif %}"><span class="ck-step-num">5</span><span class="ck-step-label">Pay</span></li>
+        <li class="ck-step {% if rs > 6 %}is-done{% endif %} {% if rs == 6 %}is-current{% endif %}"><span class="ck-step-num">6</span><span class="ck-step-label">Done</span></li>
+    </ol>
+</nav>

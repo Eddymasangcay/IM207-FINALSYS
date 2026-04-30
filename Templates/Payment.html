@@ -1,0 +1,245 @@
+﻿{% extends "base.html" %}
+{% block title %}Payment â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Payment.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-payment{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    {% set rental_step = 5 %}
+    {% include 'partials/RentalStepper.html' %}
+
+    <div class="dashboard ck-container">
+        <div class="welcome">
+            <h2>Checkout</h2>
+            <p>Review your booking, choose how you pay, then confirm.</p>
+        </div>
+
+        <div class="post-form">
+            <h3>Rental dates</h3>
+            <p class="muted">Pick when you borrow the vehicle and when you return it. The number of billed days is counted <strong>inclusively</strong> on the calendar (pickup day and return day both count).</p>
+            <form class="rental-update-form" action="{{ url_for('payment_update_rental') }}" method="POST" id="rental-dates-form">
+                {{ csrf_input()|safe }}
+                <div class="rental-dates-grid">
+                    <div>
+                        <label class="auth-label" for="pickup_date">Pickup (borrow)</label>
+                        <input id="pickup_date" type="date" name="pickup_date" value="{{ pickup_date }}" min="{{ date_min }}" required>
+                    </div>
+                    <div>
+                        <label class="auth-label" for="return_date">Return</label>
+                        <input id="return_date" type="date" name="return_date" value="{{ return_date }}" min="{{ pickup_date }}" required>
+                    </div>
+                </div>
+                <div class="rental-update-row">
+                    <button type="submit" class="btn-publish">Update total</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="post-form">
+            <h3>Booking summary</h3>
+            <div class="post">
+                <div class="meta">
+                    <span><strong>Vehicle</strong> {{ transport.name }}</span>
+                    <span><strong>Rate</strong> ${{ '%.2f' % transport.price }}</span>
+                </div>
+                <p><strong>Pickup:</strong> {{ pickup_date }} &nbsp;â†’&nbsp; <strong>Return:</strong> {{ return_date }}</p>
+                <p><strong>Rental days (inclusive):</strong> {{ quantity }}</p>
+                {% if delivery_address %}
+                <p><strong>Delivery address:</strong> {{ delivery_address }}</p>
+                {% endif %}
+                <p><strong>Total:</strong> ${{ '%.2f' % total_price }}</p>
+                <p class="muted" style="margin-top:0.5rem;">PayMongo charges in <strong>PHP</strong> using the app&rsquo;s USD&rarr;PHP rate ({{ '%.2f' % USD_TO_PHP_RATE }}).</p>
+            </div>
+        </div>
+
+        <div class="post-form">
+            <h3>Account</h3>
+            <div class="summary-lines">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                {% if user.full_name %}<p><strong>Name:</strong> {{ user.full_name }}</p>{% endif %}
+                <p><strong>Role:</strong> {% if user.is_admin %}Admin{% elif user.role == 'staff' %}Staff{% else %}Customer{% endif %}</p>
+            </div>
+        </div>
+
+        <p class="pay-page-intro">Pick your billing region, then tap a payment methodâ€”same idea as choosing language on a global site.</p>
+
+        <div class="pay-modern-wrap">
+            <div class="pay-modern-card">
+                <form action="{{ url_for('process_payment') }}" method="POST" class="payment-form" id="pay-form">
+                    {{ csrf_input()|safe }}
+                    <label class="pay-field-label" for="pay_currency">Pay in</label>
+                    <select class="pay-modern-select" id="pay_currency" name="pay_currency" aria-label="Currency and region">
+                        <option value="PHP">Philippines â€” PHP (â‚±)</option>
+                        <option value="USD">International â€” USD ($)</option>
+                    </select>
+
+                    <label class="pay-field-label" for="delivery_address">Delivery address</label>
+                    <textarea id="delivery_address" name="delivery_address" class="pay-address-input" rows="3" maxlength="300" placeholder="House/unit, street, barangay/city, landmark" required>{{ delivery_address or '' }}</textarea>
+
+                    <span class="pay-field-label" id="pay-method-group-label">Choose payment method</span>
+                    <div class="pay-method-grid" role="radiogroup" aria-labelledby="pay-method-group-label">
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="gcash" required checked aria-required="true">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--gcash" aria-hidden="true">GC</span>
+                                <span class="pay-pill-name">GCash</span>
+                            </span>
+                        </label>
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="paymongo">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--cc" aria-hidden="true">Pg</span>
+                                <span class="pay-pill-name">PayMongo</span>
+                            </span>
+                        </label>
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="paymaya">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--paymaya" aria-hidden="true">PM</span>
+                                <span class="pay-pill-name">PayMaya</span>
+                            </span>
+                        </label>
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="credit_card">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--cc" aria-hidden="true">CC</span>
+                                <span class="pay-pill-name">Credit card</span>
+                            </span>
+                        </label>
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="debit_card">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--dc" aria-hidden="true">DB</span>
+                                <span class="pay-pill-name">Debit card</span>
+                            </span>
+                        </label>
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="paypal">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--paypal" aria-hidden="true">PP</span>
+                                <span class="pay-pill-name">PayPal</span>
+                            </span>
+                        </label>
+                        <label class="pay-pill">
+                            <input type="radio" name="payment_method" value="cash">
+                            <span class="pay-pill-inner">
+                                <span class="pay-pill-icon pay-pill-icon--cash" aria-hidden="true">$</span>
+                                <span class="pay-pill-name">Cash on pickup</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div id="pay-card-panel" class="pay-card-panel" hidden>
+                        <label class="auth-label" for="card_number">Card number</label>
+                        <input id="card_number" type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="off">
+
+                        <div class="pay-row">
+                            <div>
+                                <label class="auth-label" for="expiry">Expiry</label>
+                                <input id="expiry" type="text" name="expiry" placeholder="MM/YY" maxlength="5" autocomplete="off">
+                            </div>
+                            <div>
+                                <label class="auth-label" for="cvv">CVV</label>
+                                <input id="cvv" type="text" name="cvv" placeholder="123" maxlength="4" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="pay-wallet-hint" class="pay-hint" hidden></p>
+
+                    <div class="total-banner">
+                        <strong>Total due:</strong> ${{ '%.2f' % total_price }}
+                    </div>
+
+                    <button type="submit" class="btn-pay" id="btn-standard" formaction="{{ url_for('process_payment') }}" formmethod="post">Confirm payment</button>
+                    <button type="submit" class="btn-pay" id="btn-gcash-qr" formaction="{{ url_for('gcash_qr_prepare') }}" formmethod="post" hidden>Continue to GCash QR</button>
+                    <button type="submit" class="btn-pay" id="btn-paymongo" formaction="{{ url_for('paymongo_checkout_start') }}" formmethod="post" hidden>Continue to PayMongo</button>
+                    <a class="cancel-link" href="{{ url_for('transportations') }}">Cancel and return to fleet</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_script %}
+    <script>
+        (function () {
+            var pickup = document.getElementById("pickup_date");
+            var ret = document.getElementById("return_date");
+            var dateMin = {{ date_min|tojson }};
+            if (pickup && ret) {
+                function syncReturnMin() {
+                    var p = pickup.value || dateMin;
+                    ret.min = p;
+                    if (ret.value && ret.value < p) ret.value = p;
+                }
+                pickup.addEventListener("change", syncReturnMin);
+                syncReturnMin();
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            var form = document.getElementById("pay-form");
+            if (!form) return;
+            var cardPanel = document.getElementById("pay-card-panel");
+            var walletHint = document.getElementById("pay-wallet-hint");
+            var btnStandard = document.getElementById("btn-standard");
+            var btnGcash = document.getElementById("btn-gcash-qr");
+            var btnPaymongo = document.getElementById("btn-paymongo");
+            var cardInputs = ["card_number", "expiry", "cvv"].map(function (id) {
+                return document.getElementById(id);
+            });
+
+            function currentMethod() {
+                var r = form.querySelector('input[name="payment_method"]:checked');
+                return r ? r.value : "";
+            }
+
+            function syncPanels() {
+                var m = currentMethod();
+                var showCard = m === "credit_card" || m === "debit_card";
+                var showWalletHint = m === "gcash" || m === "paymaya" || m === "paypal" || m === "paymongo";
+
+                cardPanel.hidden = !showCard;
+                walletHint.hidden = !showWalletHint;
+                if (walletHint) {
+                    if (m === "gcash") {
+                        walletHint.innerHTML = "<strong>GCash QR.</strong> You will open a secure QR screen, scan with GCash, then confirm payment to receive your receipt.";
+                    } else if (m === "paymongo") {
+                        walletHint.innerHTML = "<strong>PayMongo.</strong> You will pay in PHP on PayMongo (card, Maya, GCash, etc.). When payment succeeds, you will return here and we will open your receipt.";
+                    } else if (m === "paymaya" || m === "paypal") {
+                        walletHint.innerHTML = "<strong>Simulated checkout.</strong> In production you would be redirected to Maya or PayPal. Here, confirming saves your booking as paid.";
+                    }
+                }
+                if (btnStandard && btnGcash) {
+                    var gc = m === "gcash";
+                    var pm = m === "paymongo";
+                    btnStandard.hidden = gc || pm;
+                    btnGcash.hidden = !gc;
+                    if (btnPaymongo) btnPaymongo.hidden = !pm;
+                }
+
+                cardInputs.forEach(function (el) {
+                    if (!el) return;
+                    if (showCard) {
+                        el.removeAttribute("disabled");
+                        el.setAttribute("required", "required");
+                    } else {
+                        el.removeAttribute("required");
+                        el.setAttribute("disabled", "disabled");
+                    }
+                });
+            }
+
+            form.querySelectorAll('input[name="payment_method"]').forEach(function (radio) {
+                radio.addEventListener("change", syncPanels);
+            });
+            syncPanels();
+        })();
+    </script>
+{% endblock %}
+

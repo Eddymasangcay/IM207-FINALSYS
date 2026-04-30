@@ -1,0 +1,44 @@
+﻿{% extends "base.html" %}
+{% block title %}Upload ID â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/RentalCompliance.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-rental{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    {% set rental_step = 3 %}
+    {% include 'partials/RentalStepper.html' %}
+
+    <div class="dashboard rc-page ck-container">
+        <div class="welcome">
+            <h2>Upload your ID</h2>
+            <p>You have already agreed to the Terms &amp; Conditions. Upload a clear photo of your government ID for admin verification.</p>
+            {% if transport and pending %}
+            <p class="rc-summary"><strong>Vehicle:</strong> {{ transport.name }} Â· <strong>Estimated total:</strong> ${{ '%.2f' % pending.total_price }} Â· <strong>Dates:</strong> {{ pending.pickup_date }} â†’ {{ pending.return_date }}</p>
+            {% endif %}
+        </div>
+
+        <form class="post-form rc-form" action="{{ url_for('rental_upload_id') }}" method="POST" enctype="multipart/form-data">
+            {{ csrf_input()|safe }}
+            <h3>Identification</h3>
+
+            <label class="field-label" for="id_document_type">Valid ID type</label>
+            <select id="id_document_type" name="id_document_type" required>
+                <option value="" disabled selected>â€” Select â€”</option>
+                <option value="drivers_license">Driverâ€™s license</option>
+                <option value="passport">Passport</option>
+                <option value="national_id">National ID</option>
+            </select>
+
+            <label class="field-label" for="id_document">Upload ID (clear photo)</label>
+            <input id="id_document" type="file" name="id_document" accept="image/png,image/jpeg,image/gif,image/webp" required>
+
+            <button type="submit" class="btn-publish">Submit for admin review</button>
+            <p class="muted small"><a href="{{ url_for('rental_terms', restart=1) }}">Back to Terms</a> â€” restarts this step so you can review or change your agreement before uploading ID.</p>
+            <a class="cancel-link rc-cancel" href="{{ url_for('transportations') }}">Cancel and return to fleet</a>
+        </form>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,146 @@
+.rc-steps {
+    list-style: none;
+    margin: 0 auto 24px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 24px;
+    max-width: 560px;
+}
+
+.rc-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.rc-step span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.rc-step-active {
+    color: #0f172a;
+}
+
+.rc-step-active span {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    color: #042f2e;
+}
+
+.rc-step-done {
+    color: #047857;
+}
+
+.rc-step-done span {
+    background: #dcfce7;
+    color: #166534;
+    font-weight: 800;
+}
+
+.rc-page .welcome {
+    margin-bottom: 22px;
+}
+
+.rc-summary {
+    margin: 12px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.rc-terms-block h3 {
+    margin-top: 0;
+}
+
+.rc-terms-scroll {
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    padding: 16px 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #334155;
+}
+
+.rc-terms-h {
+    margin: 18px 0 8px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #0f172a;
+}
+
+.rc-terms-h:first-of-type {
+    margin-top: 0;
+}
+
+.rc-terms-scroll p {
+    margin: 0 0 12px;
+}
+
+.rc-terms-scroll p:last-child {
+    margin-bottom: 0;
+}
+
+.rc-terms-note {
+    margin-top: 20px !important;
+    padding-top: 14px;
+    border-top: 1px dashed #cbd5e1;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.rc-form .rc-check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.rc-form .rc-check input {
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.rc-form select,
+.rc-form input[type="file"] {
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+.rc-cancel {
+    display: inline-block;
+    margin-top: 12px;
+}
+
+body.ck-page-rental .rc-terms-scroll {
+    background: #121a24;
+    border-color: rgba(148, 163, 184, 0.15);
+    color: #cbd5e1;
+}
+
+body.ck-page-rental .rc-terms-h {
+    color: #f1f5f9;
+}
+
+body.ck-page-rental .rc-form .rc-check {
+    color: #e8edf4;
+}

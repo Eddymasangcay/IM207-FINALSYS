@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ site_brand }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Styles/SiteShared.css') }}">
+    {% block head_css %}{% endblock %}
+</head>
+<body class="ck-body {% block body_class %}{% endblock %}">
+    {% include 'partials/SiteNav.html' %}
+    {% block flashes %}
+    {% include ['partials/flashes.html', 'partials/Flashes.html'] %}
+    {% endblock %}
+    <main class="ck-main {% block main_class %}{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'partials/SiteFooter.html' %}
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    {% block body_script %}{% endblock %}
+</body>
+</html>
+

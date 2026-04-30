@@ -1,0 +1,400 @@
+.dr-page .welcome {
+    margin-bottom: 22px;
+}
+
+.dr-summary {
+    margin-bottom: 18px;
+}
+
+.dr-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.dr-kpi-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #1a2433;
+    padding: 12px;
+    color: #d6e0ef;
+    border-color: rgba(148, 163, 184, 0.22);
+}
+
+.dr-kpi-card span {
+    font-size: 0.78rem;
+    color: #ffffff;
+    display: block;
+}
+
+.dr-kpi-card strong {
+    font-size: 1.2rem;
+    color: #ffffff;
+}
+
+.dr-summary h3 {
+    margin-bottom: 12px;
+}
+
+.dr-summary-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+}
+
+.dr-summary-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    background: #1a2433;
+    color: #d6e0ef;
+}
+
+.dr-summary-item span {
+    color: #ffffff;
+}
+
+.dr-summary-item strong {
+    min-width: 30px;
+    text-align: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(8, 145, 178, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(8, 145, 178, 0.4);
+}
+
+.dr-table-wrap {
+    overflow-x: auto;
+    padding: 0;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.dr-filter-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: stretch;
+    max-width: 980px;
+    margin: 8px auto 16px;
+    width: 100%;
+}
+
+body.ck-page-dashboard .dr-page {
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dr-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    min-width: 0;
+    width: 100%;
+}
+
+.dr-filter-row label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #64748b;
+    line-height: 1.15;
+    white-space: normal;
+    max-width: 100%;
+    margin: 0;
+    text-align: center;
+}
+
+.dr-filter-row select {
+    padding: 8px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    font: inherit;
+    font-size: 0.9rem;
+    background: #0f1722;
+    color: #e8edf4;
+    width: 100%;
+    min-height: 38px;
+    margin: 0;
+    box-shadow: none;
+}
+
+.dr-filter-row select option {
+    background: #0f1722;
+    color: #e8edf4;
+}
+
+.dr-severity {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
+}
+
+.dr-severity-minor { background: rgba(22, 163, 74, 0.16); color: #86efac; border-color: rgba(22, 163, 74, 0.4); }
+.dr-severity-moderate { background: rgba(217, 119, 6, 0.16); color: #fcd34d; border-color: rgba(217, 119, 6, 0.4); }
+.dr-severity-major { background: rgba(180, 83, 9, 0.16); color: #fdba74; border-color: rgba(180, 83, 9, 0.42); }
+.dr-severity-critical { background: rgba(185, 28, 28, 0.18); color: #fca5a5; border-color: rgba(185, 28, 28, 0.45); }
+
+.dr-workflow-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
+}
+
+.dr-workflow-logged { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.45); }
+.dr-workflow-under_review { background: rgba(37, 99, 235, 0.2); color: #93c5fd; border-color: rgba(37, 99, 235, 0.45); }
+.dr-workflow-repair_scheduled { background: rgba(217, 119, 6, 0.16); color: #fcd34d; border-color: rgba(217, 119, 6, 0.4); }
+.dr-workflow-in_repair { background: rgba(180, 83, 9, 0.16); color: #fdba74; border-color: rgba(180, 83, 9, 0.42); }
+.dr-workflow-resolved { background: rgba(22, 163, 74, 0.16); color: #86efac; border-color: rgba(22, 163, 74, 0.4); }
+
+.dr-resolution-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
+}
+
+.dr-resolution-open {
+    background: rgba(180, 83, 9, 0.16);
+    color: #fdba74;
+    border-color: rgba(180, 83, 9, 0.42);
+}
+
+.dr-resolution-resolved {
+    background: rgba(22, 163, 74, 0.16);
+    color: #86efac;
+    border-color: rgba(22, 163, 74, 0.4);
+}
+
+.dr-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.dr-table th,
+.dr-table td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.dr-table th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #dbe5f3;
+    background: rgba(21, 29, 40, 0.95);
+}
+
+.dr-clip {
+    color: #b4c0d4;
+    max-width: 280px;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.dr-status-form {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.dr-status-form select {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font: inherit;
+    font-size: 0.82rem;
+}
+
+.dr-status-dialog {
+    max-width: 420px;
+}
+
+.dr-status-modal-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font: inherit;
+}
+
+.dr-status-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.dr-status-modal-actions .btn-sm {
+    flex: 1 1 0;
+}
+
+.dr-dialog {
+    max-width: 520px;
+    width: calc(100% - 32px);
+    border: none;
+    border-radius: 18px;
+    padding: 0;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    position: fixed;
+    inset: 0;
+    margin: auto;
+}
+
+.dr-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.dr-dialog-inner {
+    padding: 24px 22px 20px;
+    position: relative;
+}
+
+.dr-dialog h3 {
+    margin: 0 0 6px;
+    font-size: 1.2rem;
+}
+
+.dr-meta {
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.dr-dl {
+    margin: 0;
+    padding: 0;
+}
+
+.dr-dl dt {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
+    margin-top: 12px;
+}
+
+.dr-dl dt:first-child {
+    margin-top: 0;
+}
+
+.dr-dl dd {
+    margin: 4px 0 0;
+    color: #e8edf4;
+    line-height: 1.5;
+}
+
+.dr-detail {
+    white-space: pre-wrap;
+}
+
+.dr-dialog-x {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+
+.dr-actions {
+    margin-top: 16px;
+}
+
+.dr-close-bottom {
+    margin-top: 16px;
+    width: 100%;
+    text-align: center;
+}
+
+.dr-empty-filtered {
+    padding: 12px 14px 16px;
+}
+
+/* Keep Update + View buttons side-by-side in the table (override global .btn width rules). */
+.dr-table td:last-child {
+    white-space: nowrap;
+}
+
+.dr-table td:last-child button {
+    display: inline-flex !important;
+    width: auto !important;
+    flex: 0 0 auto;
+}
+
+.dr-table td:last-child {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Keep damage page readable */
+body.ck-page-dashboard .dr-page,
+body.ck-page-dashboard .dr-page h2,
+body.ck-page-dashboard .dr-page h3,
+body.ck-page-dashboard .dr-page p,
+body.ck-page-dashboard .dr-page span,
+body.ck-page-dashboard .dr-page td,
+body.ck-page-dashboard .dr-page th,
+body.ck-page-dashboard .dr-page label {
+    color: #d6e0ef !important;
+}
+
+body.ck-page-dashboard .dr-page .muted,
+body.ck-page-dashboard .dr-page .dr-filter-row label,
+body.ck-page-dashboard .dr-page .dr-meta {
+    color: #9fb0c7 !important;
+}
+
+/* Light backgrounds -> dark text (selects only) */
+body.ck-page-dashboard .dr-page .dr-filter-row select {
+    color: #0f172a !important;
+}
+
+body.ck-page-dashboard .dr-page .dr-filter-row label,
+body.ck-page-dashboard .dr-page .dr-table th {
+    color: #cbd5e1 !important;
+}
+
+/* Dark cards -> white text (user rule) */
+body.ck-page-dashboard .dr-page .dr-kpi-card,
+body.ck-page-dashboard .dr-page .dr-kpi-card span,
+body.ck-page-dashboard .dr-page .dr-kpi-card strong,
+body.ck-page-dashboard .dr-page .dr-summary-item,
+body.ck-page-dashboard .dr-page .dr-summary-item span,
+body.ck-page-dashboard .dr-page .dr-summary-item strong {
+    color: #ffffff !important;
+}
+
+@media (max-width: 640px) {
+    .dr-filter-row { max-width: 100%; }
+
+    .dr-table th:nth-child(7),
+    .dr-table td:nth-child(7) {
+        display: none;
+    }
+}

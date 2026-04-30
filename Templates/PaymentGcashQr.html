@@ -1,0 +1,67 @@
+﻿{% extends "base.html" %}
+{% block title %}GCash QR â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Payment.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-payment{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    {% set rental_step = 5 %}
+    {% include 'partials/RentalStepper.html' %}
+
+    <div class="dashboard ck-container">
+        <div class="welcome">
+            <h2>GCash QR</h2>
+            <p>Scan with the GCash app, complete the transfer, then confirm below so we can finish your booking.</p>
+        </div>
+
+        <div class="gcash-qr-shell">
+            <div class="gcash-qr-card">
+                <div class="gcash-qr-frame">
+                    <img class="gcash-qr-img" src="{{ url_for('static', filename='GcashQR.jpg') }}" alt="GCash QR â€” scan with the GCash app" loading="eager">
+                </div>
+                <p class="gcash-qr-fees">Transfer fees may apply.</p>
+
+                <div class="gcash-qr-merchant">
+                    <span class="gcash-qr-merchant-name">{{ merchant_title }}</span>
+                    <span class="gcash-qr-edit" title="Merchant name (demo)" aria-hidden="true">âœŽ</span>
+                </div>
+                <p class="gcash-qr-masked">{{ masked_account_name }}</p>
+                <p class="gcash-qr-line"><span class="gcash-qr-label">Mobile No.:</span> {{ masked_mobile }}</p>
+                <p class="gcash-qr-line"><span class="gcash-qr-label">User ID:</span> {{ masked_uid }}</p>
+
+                <div class="gcash-qr-meta">
+                    <p><strong>Vehicle:</strong> {{ transport.name }}</p>
+                    {% if pickup_date and return_date %}
+                    <p><strong>Pickup:</strong> {{ pickup_date }} â†’ <strong>Return:</strong> {{ return_date }}</p>
+                    {% endif %}
+                    <p><strong>Rental days:</strong> {{ quantity }}</p>
+                    {% if delivery_address %}
+                    <p><strong>Delivery address:</strong> {{ delivery_address }}</p>
+                    {% endif %}
+                    <p><strong>Reference:</strong> {{ reference }} <button type="button" class="ck-btn ck-btn--ghost ck-btn--sm" data-copy="{{ reference }}" data-label="Copy ref">Copy ref</button></p>
+                    <p><strong>Amount due:</strong> {{ money_by_region(total_price, 'PH' if pay_currency == 'PHP' else 'US') }} <span class="muted-inline">({{ pay_currency }} region)</span></p>
+                </div>
+
+                <form class="gcash-qr-confirm-form" method="post" action="{{ url_for('gcash_qr_confirm') }}">
+                    {{ csrf_input()|safe }}
+                    <input type="hidden" name="reference" value="{{ reference }}">
+                    <label class="gcash-qr-check">
+                        <input type="checkbox" name="confirm_sent" value="1" required>
+                        <span>I have sent the payment in GCash and the transfer was successful.</span>
+                    </label>
+                    <button type="submit" class="btn-pay gcash-qr-submit">Confirm payment &amp; continue</button>
+                </form>
+
+                <p class="gcash-qr-note">This is a <strong>classroom simulation</strong>. Use the QR image above; your booking reference is still recorded when you confirm.</p>
+
+                <div class="gcash-qr-actions">
+                    <a class="cancel-link" href="{{ url_for('gcash_qr_cancel') }}">Pay a different way</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

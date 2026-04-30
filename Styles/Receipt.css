@@ -1,0 +1,218 @@
+/* Professional receipt layout */
+
+.receipt-page {
+    max-width: 640px;
+    margin: 0 auto 48px;
+    padding: 0 20px;
+}
+
+.receipt-paper {
+    background: #151d28;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: var(--ck-shadow-soft);
+    overflow: hidden;
+}
+
+.receipt-header {
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f8fafc;
+}
+
+.receipt-brand {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0 0 4px;
+}
+
+.receipt-sub {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #9fb0c7;
+}
+
+.receipt-id-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 0.85rem;
+}
+
+.receipt-id-row strong {
+    color: #f4b84a;
+}
+
+.receipt-body {
+    padding: 24px 28px 28px;
+}
+
+.receipt-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+    font-size: 0.92rem;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.28);
+}
+
+.receipt-line:last-of-type {
+    border-bottom: none;
+}
+
+.receipt-period-line {
+    margin-top: 16px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.28);
+    padding-top: 12px;
+}
+
+.receipt-line span:first-child {
+    color: #9fb0c7;
+}
+
+.receipt-status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(96, 165, 250, 0.16);
+    color: #bfdbfe;
+}
+
+.receipt-status-active { background: rgba(52, 211, 153, 0.2); color: #a7f3d0; }
+.receipt-status-completed { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+.receipt-status-cancelled { background: rgba(248, 113, 113, 0.18); color: #fecaca; }
+
+.receipt-actions-modern {
+    margin-top: 24px;
+}
+
+.receipt-item-card {
+    display: flex;
+    gap: 16px;
+    padding: 18px;
+    margin: 20px 0;
+    background: #0f1722;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    text-align: left;
+}
+
+.receipt-item-img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e0f2fe, #ecfccb);
+    flex-shrink: 0;
+}
+
+.receipt-item-placeholder {
+    width: 120px;
+    height: 80px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e0f2fe, #ecfccb);
+    flex-shrink: 0;
+}
+
+.receipt-item-details h4 {
+    margin: 0 0 6px;
+    font-size: 1.05rem;
+    color: #e8edf4;
+}
+
+.receipt-item-details .desc {
+    font-size: 0.85rem;
+    color: #b4c0d4;
+    line-height: 1.45;
+    margin: 0 0 8px;
+}
+
+.receipt-item-details .specs {
+    font-size: 0.78rem;
+    color: #9fb0c7;
+    margin: 0;
+}
+
+.receipt-pricing {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid rgba(148, 163, 184, 0.3);
+}
+
+.receipt-pricing-row {
+    color: #dbe5f3;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin: 6px 0;
+}
+
+.receipt-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid rgba(148, 163, 184, 0.3);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #f8fafc;
+}
+
+.receipt-footer-note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #9fb0c7;
+    margin-top: 20px;
+    padding: 0 12px;
+}
+
+@media (max-width: 520px) {
+    .receipt-item-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .receipt-item-img,
+    .receipt-item-placeholder {
+        width: 100%;
+        height: 140px;
+    }
+}
+
+.receipt-next {
+    margin: 24px auto 0;
+    padding: 22px 24px;
+    max-width: 640px;
+}
+
+.receipt-next-title {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    color: #e8edf4;
+}
+
+.receipt-next-list {
+    margin: 0 0 16px;
+    padding-left: 20px;
+    color: #cbd5e1;
+    line-height: 1.65;
+    font-size: 0.92rem;
+}
+
+.receipt-next-list li {
+    margin-bottom: 8px;
+}
+
+.receipt-next-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}

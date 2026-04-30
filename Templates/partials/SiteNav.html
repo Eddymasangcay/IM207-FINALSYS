@@ -1,0 +1,25 @@
+<header class="site-header">
+    <div class="site-header-inner ck-container">
+        <a class="site-logo" href="{{ url_for('index') }}">{{ site_brand }}<span class="site-logo-dot">.</span></a>
+        <button type="button" class="site-nav-toggle" id="site-nav-toggle" aria-expanded="false" aria-controls="site-nav-panel" aria-label="Open menu">
+            <span class="site-nav-toggle-bar" aria-hidden="true"></span>
+            <span class="site-nav-toggle-bar" aria-hidden="true"></span>
+            <span class="site-nav-toggle-bar" aria-hidden="true"></span>
+        </button>
+        <nav class="site-nav" id="site-nav-panel" aria-label="Main">
+            <a href="{{ url_for('index') }}" class="{% if request.path == url_for('index') %}is-active{% endif %}">Home</a>
+            <a href="{{ url_for('transportations') }}" class="{% if request.path == url_for('transportations') %}is-active{% endif %}">Fleet</a>
+            <a href="{{ url_for('aboutpage') }}" class="{% if request.path == url_for('aboutpage') %}is-active{% endif %}">About</a>
+            {% if session.get('username') %}
+                {% if nav_staff %}
+                <a href="{{ url_for('damage_reports') }}" class="{% if request.path == url_for('damage_reports') %}is-active{% endif %}">Damage</a>
+                {% endif %}
+                <a href="{{ url_for('dashboard') }}" class="{% if request.path == url_for('dashboard') %}is-active{% endif %}">Dashboard</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('loginpage') }}" class="{% if request.path == url_for('loginpage') %}is-active{% endif %}">Login</a>
+                <a class="nav-cta" href="{{ url_for('registerpage') }}">Register</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>

@@ -1,0 +1,1136 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-dashboard{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    <div class="dashboard ck-container">
+        <div class="welcome profile-welcome">
+            <div class="profile-header">
+                <div class="avatar-wrap">
+                    {% if user.profile_image %}
+                    {% set img_path = user.profile_image %}
+                    {% if img_path and not img_path.startswith('static/') %}
+                    {% set img_path = 'static/' ~ img_path %}
+                    {% endif %}
+                    <img class="profile-avatar" src="{{ url_for('static', filename=img_path) }}" alt="">
+                    {% else %}
+                    <div class="profile-avatar profile-avatar-placeholder" aria-hidden="true">{{ (user.full_name or user.username)[0]|upper }}</div>
+                    {% endif %}
+                </div>
+                <div class="profile-intro">
+                    <h2>Hello, {{ user.full_name or username }}</h2>
+                    <p class="profile-sub">@{{ username }} · Region: <strong>{{ region_label(user.region) }}</strong>{% if user.birthdate %} · DOB: {{ user.birthdate.strftime('%Y-%m-%d') }}{% endif %}</p>
+                    <p class="muted" style="margin:0;">Manage your profile, payments, and rentals in one place.</p>
+                </div>
+            </div>
+            <div class="stat-cards">
+                <div class="stat-card">
+                    <span class="stat-label">Total rental days</span>
+                    <span class="stat-value">{{ total_rental_days }}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Completed trips</span>
+                    <span class="stat-value">{{ trip_count }}</span>
+                </div>
+                <div class="stat-card stat-card-hint">
+                    <span class="stat-label">Fleet</span>
+                    <span class="stat-value stat-value-small">You only see vehicles for {{ region_label(user.region) }}.</span>
+                </div>
+            </div>
+        </div>
+
+        {% if is_staff and admin_stats %}
+        <div class="admin-stats-grid post-form">
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Pending ID / rental requests</span>
+                <span class="admin-stat-value">{{ admin_stats.pending_id_requests }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Fleet listings</span>
+                <span class="admin-stat-value">{{ admin_stats.fleet_listings }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Active rentals (on the road)</span>
+                <span class="admin-stat-value">{{ admin_stats.active_rentals_now }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Approved — awaiting payment</span>
+                <span class="admin-stat-value">{{ admin_stats.approved_awaiting_payment }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Paid bookings (all time)</span>
+                <span class="admin-stat-value">{{ admin_stats.paid_bookings_all_time }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Revenue (paid, USD)</span>
+                <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_paid_bookings_usd }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Revenue this month (USD)</span>
+                <span class="admin-stat-value">${{ '%.2f' % admin_stats.revenue_this_month_usd }}</span>
+            </div>
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">Fleet utilization</span>
+                <span class="admin-stat-value">{{ '%.1f' % admin_stats.fleet_utilization_pct }}%</span>
+            </div>
+        </div>
+        {% if admin_charts %}
+        <div class="post-form admin-graphs">
+            <h3>Operations graphs</h3>
+            <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
+            <div class="admin-graphs-grid">
+                <div class="admin-graph-card">
+                    <h4>Rental request statuses</h4>
+                    {% for item in admin_charts.rental_request_status %}
+                    <div class="bar-row">
+                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="admin-graph-card">
+                    <h4>Booking lifecycle</h4>
+                    {% for item in admin_charts.booking_lifecycle %}
+                    <div class="bar-row">
+                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <div class="dashboard-layout">
+            <aside class="dashboard-sidebar" aria-label="Dashboard sections">
+                <h3>Dashboard menu</h3>
+                <p class="dash-side-group-label">Essential</p>
+                <details class="dash-submenu" open>
+                    <summary>My rental requests</summary>
+                    <button type="button" class="dash-side-link is-active" data-target="dash-my-requests" data-request-filter="all">All requests</button>
+                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="paid">Paid</button>
+                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="approved">Approved</button>
+                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="pending_review">Awaiting admin</button>
+                    <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="rejected">Rejected</button>
+                </details>
+                <button type="button" class="dash-side-link" data-target="sec-bookings">Your bookings</button>
+                {% if is_staff or is_admin %}
+                <button type="button" class="dash-side-link" data-target="sec-admin-bookings">All bookings (admin)</button>
+                {% endif %}
+                <button type="button" class="dash-side-link" data-target="dash-notifications">Notifications</button>
+                <button type="button" class="dash-side-link" data-target="dash-profile">Profile</button>
+                <button type="button" class="dash-side-link" data-target="dash-payment-methods">Payment methods</button>
+                <button type="button" class="dash-side-link" data-target="dash-security">Security</button>
+                {% if is_staff %}
+                <p class="dash-side-group-label">Operations</p>
+                <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
+                <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
+                <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
+                <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
+                <details class="dash-advanced">
+                    <summary>Advanced tools</summary>
+                    <button type="button" class="dash-side-link" data-target="sec-fleet">Add vehicle</button>
+                    <button type="button" class="dash-side-link" data-target="dash-renter-reviews">Renter reviews</button>
+                    <button type="button" class="dash-side-link" data-target="sec-users">Manage users</button>
+                </details>
+                {% endif %}
+            </aside>
+
+            <div class="dashboard-content">
+        <div class="post-form dashboard-panel" id="dash-my-requests">
+            <h3>My rental requests</h3>
+            <p class="muted">After you book from the fleet, accept the <strong>Terms &amp; Conditions</strong> first, then upload your <strong>ID</strong> on the next page. When an admin approves, use <strong>Pay now</strong> to continue to checkout.</p>
+            {% if user_rental_requests %}
+            <div class="rr-user-table-wrap">
+                <table class="rr-user-table">
+                    <thead>
+                        <tr>
+                            <th>Ref</th>
+                            <th>Vehicle</th>
+                            <th>Dates</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in user_rental_requests %}
+                        <tr data-rr-status="{{ r.status }}">
+                            <td>
+                                <code class="rr-ref">RR-{{ '%05d' % r.id }}</code>
+                                <button type="button" class="ck-btn ck-btn--ghost ck-btn--sm" data-copy="RR-{{ '%05d' % r.id }}" data-label="Copy">Copy</button>
+                            </td>
+                            <td>{{ r.vehicle.name if r.vehicle else '—' }}</td>
+                            <td>{{ r.pickup_date }} → {{ r.return_date }}</td>
+                            <td>${{ '%.2f' % r.total_price }}</td>
+                            <td>
+                                {% if r.status == 'pending_review' %}<span class="tag tag-pending">Awaiting admin</span>
+                                {% elif r.status == 'approved' %}<span class="tag tag-approved">Approved</span>
+                                {% elif r.status == 'rejected' %}<span class="tag tag-rejected">Rejected</span>
+                                {% elif r.status == 'paid' %}<span class="tag tag-paid">Paid</span>
+                                {% else %}{{ r.status }}{% endif %}
+                            </td>
+                            <td>
+                                {% if r.status == 'approved' %}
+                                <a class="btn btn-sm" href="{{ url_for('rental_pay_start', request_id=r.id) }}">Pay now</a>
+                                {% elif r.status == 'pending_review' %}
+                                <form method="post" action="{{ url_for('rental_request_user_cancel', request_id=r.id) }}" class="rr-cancel-form" onsubmit="return confirm('Cancel this reservation request? You can book again from the fleet.');">
+                                    {{ csrf_input()|safe }}
+                                    <button type="submit" class="ck-btn ck-btn--ghost ck-btn--sm">Cancel request</button>
+                                </form>
+                                {% elif r.status == 'rejected' and r.rejection_reason %}
+                                <span class="muted small">{{ r.rejection_reason[:60] }}{% if (r.rejection_reason or '')|length > 60 %}…{% endif %}</span>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p id="rr-empty-filtered" class="muted" hidden>No requests match this status filter.</p>
+            </div>
+            {% else %}
+            <p class="muted">No rental requests yet. Start from the <a href="{{ url_for('transportations') }}">fleet</a>.</p>
+            {% endif %}
+        </div>
+
+        {% if is_staff %}
+        <div class="post-form dashboard-panel" id="dash-id-queue">
+            <h3>Renter ID &amp; compliance queue</h3>
+            <p class="muted">Verify ID uploads, then approve or reject. Renters pay only after approval.</p>
+            {% if admin_rr_pending %}
+            <div class="rr-admin-table-wrap">
+                <table class="rr-admin-table">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>Renter</th>
+                            <th>Vehicle</th>
+                            <th>Dates</th>
+                            <th>ID type</th>
+                            <th>ID file</th>
+                            <th>Submitted</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in admin_rr_pending %}
+                        <tr>
+                            <td class="rr-col-request">#{{ r.id }}<br><span class="muted small">${{ '%.2f' % r.total_price }}</span></td>
+                            <td class="rr-col-renter">{{ r.renter.username if r.renter else '?' }}{% if r.renter and r.renter.full_name %}<br><span class="muted small">{{ r.renter.full_name }}</span>{% endif %}</td>
+                            <td class="rr-col-vehicle">{{ r.vehicle.name if r.vehicle else '—' }}</td>
+                            <td class="rr-col-dates">{{ r.pickup_date }} → {{ r.return_date }}</td>
+                            <td class="rr-col-idtype">{{ r.id_document_type|replace('_', ' ')|title }}</td>
+                            <td class="rr-col-idfile">
+                                {% set id_href = r|rental_id_view_url %}
+                                {% if id_href %}
+                                <a class="btn-secondary-outline btn-sm" target="_blank" rel="noopener" href="{{ id_href }}">View ID</a>
+                                {% else %}
+                                —
+                                {% endif %}
+                            </td>
+                            <td class="rr-col-submitted">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="rr-col-actions">
+                                <div class="rr-action-inline">
+                                    <form class="rr-approve-form" action="{{ url_for('admin_rental_request_approve', request_id=r.id) }}" method="POST">
+                                        {{ csrf_input()|safe }}
+                                        <button type="submit" class="btn-publish btn-sm">Approve</button>
+                                    </form>
+                                    <button type="button" class="btn-muted btn-sm js-open-reject" data-target="rr-reject-modal-{{ r.id }}">Reject</button>
+                                </div>
+                                <dialog class="rr-reject-modal" id="rr-reject-modal-{{ r.id }}">
+                                    <form action="{{ url_for('admin_rental_request_reject', request_id=r.id) }}" method="POST" class="rr-reject-form rr-reject-modal-form">
+                                        {{ csrf_input()|safe }}
+                                        <button type="button" class="fleet-modal-close rr-reject-close js-close-reject" data-target="rr-reject-modal-{{ r.id }}" aria-label="Close">&times;</button>
+                                        <h4>Reject request #{{ r.id }}</h4>
+                                        <p class="muted small">Please provide a reason before rejecting this rental request.</p>
+                                        <label class="field-label" for="rr-reason-{{ r.id }}">Rejection reason</label>
+                                        <input id="rr-reason-{{ r.id }}" type="text" name="rejection_reason" placeholder="Enter rejection reason" maxlength="300" autocomplete="off" required>
+                                        <div class="rr-reject-actions">
+                                            <button type="submit" class="btn-muted btn-sm">Confirm reject</button>
+                                            <button type="button" class="btn-secondary-outline btn-sm js-close-reject" data-target="rr-reject-modal-{{ r.id }}">Cancel</button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="muted">No requests awaiting review.</p>
+            {% endif %}
+        </div>
+
+        <div class="post-form dashboard-panel" id="dash-renter-reviews">
+            <h3>Renter reviews (internal)</h3>
+            <p class="muted">Staff notes on renters for future reference. Visible to all staff.</p>
+            <form class="renter-review-form" action="{{ url_for('admin_renter_review_add') }}" method="POST">
+                {{ csrf_input()|safe }}
+                <label class="field-label" for="renter_id">Renter (customer account)</label>
+                <select id="renter_id" name="renter_id" required>
+                    <option value="">— Select user —</option>
+                    {% for u in users_for_damage_party %}
+                    {% if not u.is_admin and u.role != 'staff' %}
+                    <option value="{{ u.id }}">{{ u.username }}{% if u.full_name %} — {{ u.full_name }}{% endif %}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <label class="field-label" for="rating">Rating</label>
+                <select id="rating" name="rating" required>
+                    {% for n in [1, 2, 3, 4, 5] %}
+                    <option value="{{ n }}">{{ n }} / 5</option>
+                    {% endfor %}
+                </select>
+                <label class="field-label" for="review_body">Review</label>
+                <textarea id="review_body" name="body" rows="3" required placeholder="Punctual, vehicle returned clean, etc." maxlength="2000"></textarea>
+                <button type="submit" class="btn-publish">Save review</button>
+            </form>
+            {% if renter_reviews_list %}
+            <div class="renter-review-list">
+                {% for rev in renter_reviews_list %}
+                <div class="renter-review-card">
+                    <div class="renter-review-meta">
+                        <strong>{{ rev.renter.username if rev.renter else '?' }}</strong>
+                        <span class="renter-review-stars">{{ '★' * rev.rating }}{{ '☆' * (5 - rev.rating) }}</span>
+                        <span class="muted small">{{ rev.created_at.strftime('%Y-%m-%d') }} · by {{ rev.author.username if rev.author else '?' }}</span>
+                    </div>
+                    <p class="renter-review-body">{{ rev.body }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No reviews yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="post-form dashboard-panel" id="dash-analytics">
+            <h3>Operations analytics</h3>
+            <p class="muted">Recent payments and operational KPIs for staff/admin.</p>
+            {% if recent_transactions %}
+            <div class="dash-table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Booking</th>
+                            <th>User</th>
+                            <th>Method</th>
+                            <th>Amount</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in recent_transactions %}
+                        <tr>
+                            <td>{{ tx.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>#{{ tx.booking_id }}</td>
+                            <td>{{ tx.user.username if tx.user else '—' }}</td>
+                            <td>{{ tx.method|upper }}</td>
+                            <td>${{ '%.2f' % tx.amount }}{% if tx.currency %} {{ tx.currency }}{% endif %}</td>
+                            <td>{{ tx.reference or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="muted">No payment transactions yet.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="post-form settings-col dashboard-panel" id="dash-profile">
+            <h3>Profile</h3>
+            <p class="muted">Update your name, email, region, date of birth (must be {{ min_rental_age }}+ to rent), and photo.</p>
+            <form class="profile-form" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+                {{ csrf_input()|safe }}
+                <label class="field-label" for="full_name">Full name</label>
+                <input id="full_name" type="text" name="full_name" value="{{ user.full_name or '' }}" placeholder="Your name" autocomplete="name">
+
+                <label class="field-label" for="email">Email</label>
+                <input id="email" type="email" name="email" value="{{ user.email or '' }}" placeholder="you@example.com" autocomplete="email">
+
+                <label class="field-label" for="birthdate">Date of birth</label>
+                <input id="birthdate" type="date" name="birthdate" value="{{ user.birthdate.strftime('%Y-%m-%d') if user.birthdate else '' }}" max="{{ birthdate_max }}" min="1940-01-01">
+
+                <label class="field-label" for="region">Region</label>
+                <select id="region" name="region" aria-describedby="region-help">
+                    <option value="PH" {% if user.region == 'PH' %}selected{% endif %}>Philippines</option>
+                    <option value="US" {% if user.region == 'US' %}selected{% endif %}>United States</option>
+                </select>
+                <p id="region-help" class="field-hint">Changing region updates which vehicles appear in the fleet for your account.</p>
+
+                <label class="field-label" for="avatar">Profile photo</label>
+                <input id="avatar" type="file" name="avatar" accept="image/png,image/jpeg,image/gif,image/webp">
+
+                <button type="submit" class="btn-publish">Save profile</button>
+            </form>
+        </div>
+
+        <div class="post-form settings-col dashboard-panel" id="dash-payment-methods">
+            <h3>Saved payment methods</h3>
+            <p class="muted">Store labels for how you usually pay (e.g. GCash number last digits). Not charged automatically.</p>
+            <form action="{{ url_for('update_saved_payment_methods') }}" method="POST">
+                {{ csrf_input()|safe }}
+                {% for i in [1, 2, 3] %}
+                {% set pm = saved_methods[i - 1] if saved_methods and saved_methods|length >= i else None %}
+                <div class="pm-slot">
+                    <p class="pm-slot-title">Method {{ i }}</p>
+                    <label class="sr-only" for="pm_type_{{ i }}">Type {{ i }}</label>
+                    <select id="pm_type_{{ i }}" name="pm_type_{{ i }}">
+                        <option value="">— type —</option>
+                        <option value="gcash" {% if pm and pm['type'] == 'gcash' %}selected{% endif %}>GCash</option>
+                        <option value="paymaya" {% if pm and pm['type'] == 'paymaya' %}selected{% endif %}>PayMaya</option>
+                        <option value="card" {% if pm and pm['type'] == 'card' %}selected{% endif %}>Card</option>
+                        <option value="paypal" {% if pm and pm['type'] == 'paypal' %}selected{% endif %}>PayPal</option>
+                        <option value="bank" {% if pm and pm['type'] == 'bank' %}selected{% endif %}>Bank</option>
+                    </select>
+                    <label class="sr-only" for="pm_note_{{ i }}">Note {{ i }}</label>
+                    <input id="pm_note_{{ i }}" type="text" name="pm_note_{{ i }}" value="{{ pm['note'] if pm else '' }}" placeholder="Label or last 4 digits" maxlength="80">
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn-publish">Save payment methods</button>
+            </form>
+        </div>
+
+        <div class="post-form dashboard-panel" id="dash-security">
+            <div class="post-form-head">
+                <h3>Security</h3>
+                <button type="button" id="togglePasswordForm" class="toggle-btn" onclick="togglePasswordForm()">Change password</button>
+            </div>
+            <form id="passwordForm" action="{{ url_for('change_password') }}" method="POST" class="stack-form hidden-form">
+                {{ csrf_input()|safe }}
+                <input type="password" name="current_password" placeholder="Current password" required autocomplete="current-password">
+                <input type="password" name="new_password" placeholder="New password" required autocomplete="new-password">
+                <button type="submit">Update password</button>
+                <button type="button" class="btn-muted" onclick="togglePasswordForm()">Cancel</button>
+            </form>
+        </div>
+
+        <div class="post-form dashboard-panel" id="dash-notifications">
+            <h3>Notifications</h3>
+            <p class="muted">Updates for approvals, payments, and account activity.</p>
+            {% if notifications %}
+            <div class="notif-list">
+                {% for n in notifications %}
+                <div class="notif-item {% if not n.is_read %}notif-item-unread{% endif %}">
+                    <div class="notif-head">
+                        <strong>{{ n.title }}</strong>
+                        <span class="muted small">{{ n.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                    <p class="notif-body">{{ n.message }}</p>
+                    {% if not n.is_read %}
+                    <form action="{{ url_for('mark_notification_read', notification_id=n.id) }}" method="POST" class="notif-form">
+                        {{ csrf_input()|safe }}
+                        <button type="submit" class="btn-muted btn-sm">Mark as read</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No notifications yet.</p>
+            {% endif %}
+        </div>
+
+        {% if is_staff %}
+        <div class="post-form publish-card dashboard-panel" id="sec-fleet">
+            <h3>Add a vehicle to the fleet</h3>
+            <p class="muted">Upload an image <strong>or</strong> paste an image URL. Set the region this unit is exclusive to.</p>
+            <form class="publish-form" action="{{ url_for('staff_add_transportation') }}" method="POST" enctype="multipart/form-data">
+                {{ csrf_input()|safe }}
+                <div class="publish-grid">
+                    <label>Vehicle name
+                        <input type="text" name="name" placeholder="e.g. Hybrid sedan" required maxlength="150">
+                    </label>
+                    <label>Daily price (USD)
+                        <input type="number" name="price" step="0.01" min="0.01" placeholder="49.00" required>
+                    </label>
+                    <label>Region
+                        <select name="region">
+                            <option value="PH">Philippines</option>
+                            <option value="US">United States</option>
+                        </select>
+                    </label>
+                    <label>Seats
+                        <input type="number" name="seats" min="1" max="60" placeholder="e.g. 5">
+                    </label>
+                    <label>Fuel type
+                        <select name="fuel_type">
+                            <option value="">Select fuel</option>
+                            <option value="gasoline">Gasoline</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="hybrid">Hybrid</option>
+                            <option value="electric">Electric</option>
+                        </select>
+                    </label>
+                    <label>Transmission
+                        <select name="transmission">
+                            <option value="">Select transmission</option>
+                            <option value="automatic">Automatic</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                    </label>
+                    <label class="span-2">Short description
+                        <input type="text" name="description" placeholder="Compact city car, ideal for traffic" maxlength="500">
+                    </label>
+                    <label class="span-2">Specs (comma or short line)
+                        <input type="text" name="specs" placeholder="5 seats · Auto · AC · Bluetooth" maxlength="300">
+                    </label>
+                    <label class="span-2">Image URL (optional if you upload a file)
+                        <input type="url" name="image_url" placeholder="https://…" maxlength="500">
+                    </label>
+                    <label class="span-2">Or upload image file
+                        <input type="file" name="vehicle_image" accept="image/png,image/jpeg,image/gif,image/webp">
+                    </label>
+                </div>
+                <button type="submit" class="btn-publish">Save to fleet</button>
+            </form>
+        </div>
+
+        <div class="post-form dashboard-panel" id="sec-damage">
+            <h3>Log vehicle damage</h3>
+            <p class="muted">Link a booking when the renter should see this damage on their <strong>Track rental</strong> page. Leave booking blank for internal-only fleet notes (still listed under Damage reports).</p>
+            <p class="muted"><a href="{{ url_for('damage_reports') }}">View all damage reports</a></p>
+            <div class="damage-workflow-guide">
+                <span class="tag">1. Under review</span>
+                <span class="tag">2. Repair scheduled</span>
+                <span class="tag">3. In repair</span>
+            </div>
+            {% if damage_status_summary %}
+            <div class="damage-status-summary">
+                {% for item in damage_status_summary %}
+                <div class="damage-status-chip">
+                    <span>{{ item.key|replace('_', ' ')|title }}</span>
+                    <strong>{{ item.count }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <form action="{{ url_for('staff_add_damage') }}" method="POST" class="damage-form">
+                {{ csrf_input()|safe }}
+                <label class="field-label" for="damage-vehicle">Vehicle</label>
+                <select id="damage-vehicle" name="transportation_id" required>
+                    <option value="">— select —</option>
+                    {% for t in transportations %}
+                    <option value="{{ t.id }}">{{ t.name }} ({{ region_label(t.region) }})</option>
+                    {% endfor %}
+                </select>
+
+                <label class="field-label" for="booking_select">Recent booking (optional)</label>
+                <select id="booking_select" name="booking_select">
+                    <option value="">— None / enter ID below —</option>
+                    {% for rb in recent_bookings_for_damage %}
+                    <option value="{{ rb.id }}">#{{ rb.id }} · {{ rb.transportation.name }} · {{ rb.user.username if rb.user else '?' }} · {{ rb.created_at.strftime('%Y-%m-%d') }}</option>
+                    {% endfor %}
+                </select>
+                <label class="field-label" for="booking_id_manual">Or booking ID (manual)</label>
+                <input id="booking_id_manual" type="number" name="booking_id_manual" min="1" placeholder="e.g. 12">
+
+                <label class="field-label" for="area_on_vehicle">Area on vehicle</label>
+                <input id="area_on_vehicle" type="text" name="area_on_vehicle" required placeholder="e.g. Rear bumper left" maxlength="120">
+                <label class="field-label" for="damage_description">Damage detail</label>
+                <textarea id="damage_description" name="damage_description" required rows="3" placeholder="Describe the damage"></textarea>
+
+                <label class="field-label" for="severity">Severity</label>
+                <select id="severity" name="severity">
+                    <option value="minor">Minor</option>
+                    <option value="moderate" selected>Moderate</option>
+                    <option value="major">Major</option>
+                    <option value="critical">Critical</option>
+                </select>
+                <label class="field-label" for="repair_estimate_usd">Estimated repair cost (USD, optional)</label>
+                <input id="repair_estimate_usd" type="number" step="0.01" min="0" name="repair_estimate_usd" placeholder="e.g. 250.00">
+                <label class="field-label" for="damage_status">Workflow status</label>
+                <select id="damage_status" name="damage_status">
+                    <option value="under_review" selected>Under review</option>
+                    <option value="repair_scheduled">Repair scheduled</option>
+                    <option value="in_repair">In repair</option>
+                </select>
+                <label class="field-label rc-inline-check">
+                    <input type="checkbox" name="is_resolved" value="1">
+                    <span>Mark as resolved upon logging</span>
+                </label>
+
+                <label class="field-label" for="responsible_user_id">Responsible — user account (optional)</label>
+                <select id="responsible_user_id" name="responsible_user_id">
+                    <option value="">— Not a registered user / use manual below —</option>
+                    {% for u in users_for_damage_party %}
+                    <option value="{{ u.id }}">{{ u.username }}{% if u.full_name %} — {{ u.full_name }}{% endif %}</option>
+                    {% endfor %}
+                </select>
+                <label class="field-label" for="responsible_party_manual">Or responsible party (manual)</label>
+                <input id="responsible_party_manual" type="text" name="responsible_party_manual" placeholder="Insurer, third party, weather, etc." maxlength="200">
+
+                <button type="submit" class="btn-publish">Save damage record</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="post-form dashboard-panel" id="sec-bookings">
+            <h3>Your bookings</h3>
+            <div class="posts">
+                {% for b in bookings %}
+                <div class="post booking-post">
+                    {% set thumb = vehicle_image_url(b.transportation) %}
+                    {% if thumb %}
+                    <img class="booking-thumb" src="{{ thumb }}" alt="">
+                    {% else %}
+                    <div class="booking-thumb booking-thumb-ph" aria-hidden="true"></div>
+                    {% endif %}
+                    <div class="booking-post-body">
+                        <div class="meta">
+                            <span>{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                            <span>Total: ${{ '%.2f' % b.total_price }}</span>
+                        </div>
+                        <div class="booking-title">{{ b.transportation.name }}</div>
+                        <div class="muted small">
+                            {{ b.rental_days or b.quantity }} rental day(s) @ ${{ '%.2f' % b.transportation.price }} / day
+                        </div>
+                        {% if b.rental_start %}
+                        <div class="muted small">Period: {{ b.rental_start.strftime('%Y-%m-%d') }}{% if b.rental_end %} → {{ b.rental_end.strftime('%Y-%m-%d') }}{% endif %}</div>
+                        {% endif %}
+                        {% if b.delivery_address %}
+                        <div class="muted small">Delivery: {{ b.delivery_address }}</div>
+                        {% endif %}
+                        {% if b.plate_number %}
+                        <div class="plate-line">
+                            Plate: <strong>{{ b.plate_number }}</strong>
+                        </div>
+                        {% endif %}
+                        {% if b.payment_method %}
+                        <div class="plate-line">
+                            Paid with:
+                            <strong>
+                                {% if b.payment_method == 'gcash' %}GCash
+                                {% elif b.payment_method == 'paymongo' %}PayMongo
+                                {% elif b.payment_method == 'paymaya' %}PayMaya
+                                {% elif b.payment_method == 'credit_card' %}Credit card
+                                {% elif b.payment_method == 'debit_card' %}Debit card
+                                {% elif b.payment_method == 'paypal' %}PayPal
+                                {% elif b.payment_method == 'cash' %}Cash
+                                {% else %}{{ b.payment_method }}{% endif %}
+                            </strong>
+                            {% if b.pay_currency %}<span class="muted">({{ b.pay_currency }})</span>{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if b.booking_status %}
+                        <div class="plate-line">Rental status:
+                            <span class="tag tag-booking-status">
+                                {% if b.booking_status == 'cancelled' %}Cancelled
+                                {% elif b.delivery_returned %}Returned
+                                {% elif b.delivery_returned_by_user %}Returned (you)
+                                {% else %}In-Delivery
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if b.delivery_received %}
+                        <div class="muted small">Delivery received (reported): <strong>Yes</strong></div>
+                        {% endif %}
+                        <div class="muted small">
+                            Expected delivery:
+                            <strong>{% if b.expected_delivery_at %}{{ b.expected_delivery_at.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}</strong>
+                        </div>
+                        <div class="muted small">
+                            Actual delivery:
+                            <strong>{% if b.actual_delivery_at %}{{ b.actual_delivery_at.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}</strong>
+                        </div>
+                        <div class="muted small">
+                            Delivery delay:
+                            {% if b.is_delivery_delayed %}
+                                <strong>Delayed by {{ b.delivery_delay_minutes or 0 }} min</strong>
+                                {% if b.delay_reason %}· {{ b.delay_reason }}{% endif %}
+                            {% else %}
+                                <strong>On time</strong>
+                            {% endif %}
+                        </div>
+                        {% if is_staff or is_admin %}
+                        <div class="muted small">
+                            Returned (admin):
+                            <strong>
+                                {% if b.delivery_returned %}Yes{% else %}No{% endif %}
+                            </strong>
+                            {% if b.delivery_returned_at %}· {{ b.delivery_returned_at.strftime('%Y-%m-%d') }}{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if b.delivery_returned_by_user %}
+                        <div class="muted small">
+                            Returned (you):
+                            <strong>Yes</strong>
+                            {% if b.delivery_returned_by_user_at %}· {{ b.delivery_returned_by_user_at.strftime('%Y-%m-%d') }}{% endif %}
+                        </div>
+                        {% endif %}
+                        <div class="actions booking-actions">
+                            <a href="{{ url_for('booking_track', booking_id=b.id) }}">Track &amp; GPS</a>
+                            <a href="{{ url_for('receipt', booking_id=b.id) }}">Receipt</a>
+                        </div>
+                        <div class="booking-manual-actions">
+                            <div class="booking-manual-primary-row">
+                                {% if (not b.delivery_received) and (b.booking_status != 'cancelled') and (not b.delivery_returned) and (not b.delivery_returned_by_user) %}
+                                <form method="POST" action="{{ url_for('booking_mark_received', booking_id=b.id) }}">
+                                    {{ csrf_input()|safe }}
+                                    <button type="submit" class="btn-secondary-outline btn-sm booking-manual-btn">Received</button>
+                                </form>
+                                {% endif %}
+
+                                {% if b.delivery_received and (not b.delivery_returned) and (not b.delivery_returned_by_user) and (b.booking_status != 'cancelled') and b.rental_end and b.rental_end <= now_utc %}
+                                <form method="POST" action="{{ url_for('booking_mark_returned_by_user', booking_id=b.id) }}">
+                                    {{ csrf_input()|safe }}
+                                    <button type="submit" class="btn btn-sm booking-manual-update">Completed</button>
+                                </form>
+                                {% endif %}
+                            </div>
+
+                            {% if is_admin %}
+                            <div class="booking-manual-admin-row">
+                                {% if not b.delivery_returned %}
+                                    <form method="POST" action="{{ url_for('admin_booking_mark_received', booking_id=b.id) }}">
+                                        {{ csrf_input()|safe }}
+                                        <button type="submit" class="btn-secondary-outline btn-sm booking-manual-btn">Admin mark returned</button>
+                                    </form>
+                                {% endif %}
+                                {% if b.booking_status == 'active' %}
+                                    <form method="POST" action="{{ url_for('admin_booking_mark_delayed', booking_id=b.id) }}" class="booking-manual-status-form">
+                                        {{ csrf_input()|safe }}
+                                        <input type="text" name="delay_reason" class="booking-status-select" placeholder="Delay reason (traffic, weather, etc.)" maxlength="500">
+                                        <button type="submit" class="btn btn-sm booking-manual-update">Mark delayed</button>
+                                    </form>
+                                    {% if b.is_delivery_delayed %}
+                                    <form method="POST" action="{{ url_for('admin_booking_clear_delay', booking_id=b.id) }}">
+                                        {{ csrf_input()|safe }}
+                                        <button type="submit" class="btn-secondary-outline btn-sm booking-manual-btn">Clear delay</button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="muted">You have no paid bookings yet. <a href="{{ url_for('transportations') }}">Browse the fleet</a>.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if is_staff or is_admin %}
+        <div class="post-form admin-panel dashboard-panel" id="sec-admin-bookings">
+            <h3>All bookings (admin)</h3>
+            <div class="posts">
+                {% if admin_bookings %}
+                    {% for b in admin_bookings %}
+                    <div class="post booking-post">
+                        {% set thumb = vehicle_image_url(b.transportation) %}
+                        {% if thumb %}
+                        <img class="booking-thumb" src="{{ thumb }}" alt="">
+                        {% else %}
+                        <div class="booking-thumb booking-thumb-ph" aria-hidden="true"></div>
+                        {% endif %}
+                        <div class="booking-post-body">
+                            <div class="meta">
+                                <span>{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                <span>Total: {{ money_by_region(b.total_price, b.transportation.region) }}</span>
+                            </div>
+                            <div class="booking-title">{{ b.transportation.name }}</div>
+                            <div class="muted small">Customer: <strong>{{ b.user.username }}</strong></div>
+
+                            {% if b.delivery_address %}
+                            <div class="muted small">Delivery: {{ b.delivery_address }}</div>
+                            {% endif %}
+
+                            {% if b.plate_number %}
+                            <div class="plate-line">
+                                Plate: <strong>{{ b.plate_number }}</strong>
+                            </div>
+                            {% endif %}
+
+                            <div class="plate-line">Rental status:
+                                <span class="tag tag-booking-status">
+                                    {% if b.booking_status == 'cancelled' %}Cancelled
+                                    {% elif b.delivery_returned %}Returned
+                                    {% elif b.delivery_returned_by_user %}Returned (you)
+                                    {% else %}In-Delivery
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            {% if b.delivery_received %}
+                            <div class="muted small">
+                                User reported received:
+                                <strong>Yes</strong>
+                                {% if b.delivery_received_at %}({{ b.delivery_received_at.strftime('%Y-%m-%d') }}){% endif %}
+                            </div>
+                            {% else %}
+                            <div class="muted small">
+                                User reported received: <strong>No</strong>
+                            </div>
+                            {% endif %}
+
+                            <div class="muted small">
+                                Admin returned:
+                                <strong>{% if b.delivery_returned %}Yes{% else %}No{% endif %}</strong>
+                                {% if b.delivery_returned_at %}({{ b.delivery_returned_at.strftime('%Y-%m-%d') }}){% endif %}
+                            </div>
+
+                            <div class="muted small">
+                                User returned:
+                                <strong>{% if b.delivery_returned_by_user %}Yes{% else %}No{% endif %}</strong>
+                                {% if b.delivery_returned_by_user_at %}({{ b.delivery_returned_by_user_at.strftime('%Y-%m-%d') }}){% endif %}
+                            </div>
+                            <div class="muted small">
+                                Expected delivery:
+                                <strong>{% if b.expected_delivery_at %}{{ b.expected_delivery_at.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}</strong>
+                            </div>
+                            <div class="muted small">
+                                Actual delivery:
+                                <strong>{% if b.actual_delivery_at %}{{ b.actual_delivery_at.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}</strong>
+                            </div>
+                            <div class="muted small">
+                                Delivery delay:
+                                {% if b.is_delivery_delayed %}
+                                    <strong>Delayed by {{ b.delivery_delay_minutes or 0 }} min</strong>
+                                    {% if b.delay_reason %}({{ b.delay_reason }}){% endif %}
+                                {% else %}
+                                    <strong>On time</strong>
+                                {% endif %}
+                            </div>
+
+                            <div class="actions booking-actions">
+                                <a href="{{ url_for('booking_track', booking_id=b.id) }}">Track &amp; GPS</a>
+                                <a href="{{ url_for('receipt', booking_id=b.id) }}">Receipt</a>
+                            </div>
+
+                            <div class="booking-manual-actions">
+                                {% if is_admin %}
+                                <div class="booking-manual-admin-row">
+                                    {% if not b.delivery_returned %}
+                                    <form method="POST" action="{{ url_for('admin_booking_mark_received', booking_id=b.id) }}">
+                                        {{ csrf_input()|safe }}
+                                        <button type="submit" class="btn-secondary-outline btn-sm booking-manual-btn">Admin mark returned</button>
+                                    </form>
+                                    {% endif %}
+                                    {% if b.booking_status == 'active' %}
+                                        <form method="POST" action="{{ url_for('admin_booking_mark_delayed', booking_id=b.id) }}" class="booking-manual-status-form">
+                                            {{ csrf_input()|safe }}
+                                            <input type="text" name="delay_reason" class="booking-status-select" placeholder="Delay reason (traffic, weather, etc.)" maxlength="500">
+                                            <button type="submit" class="btn btn-sm booking-manual-update">Mark delayed</button>
+                                        </form>
+                                        {% if b.is_delivery_delayed %}
+                                        <form method="POST" action="{{ url_for('admin_booking_clear_delay', booking_id=b.id) }}">
+                                            {{ csrf_input()|safe }}
+                                            <button type="submit" class="btn-secondary-outline btn-sm booking-manual-btn">Clear delay</button>
+                                        </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="muted">No paid bookings yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if is_admin %}
+        <div class="post-form admin-panel dashboard-panel" id="sec-users">
+            <h3>Manage users</h3>
+            {% if all_users %}
+            <div class="dash-table-wrap">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Current role</th>
+                            <th>Change role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in all_users %}
+                        <tr>
+                            <td><strong>{{ u.username }}</strong></td>
+                            <td>
+                                {% if u.is_admin %}
+                                    <span class="tag tag-admin">Admin</span>
+                                {% elif u.role == 'staff' %}
+                                    <span class="tag tag-staff">Staff</span>
+                                {% else %}
+                                    <span class="tag">User</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form action="{{ url_for('admin_update_user_role', user_id=u.id) }}" method="POST" class="table-inline-form">
+                                    {{ csrf_input()|safe }}
+                                    <label class="sr-only" for="role-{{ u.id }}">Role for {{ u.username }}</label>
+                                    <select id="role-{{ u.id }}" name="role">
+                                        <option value="user" {% if u.role == 'user' and not u.is_admin %}selected{% endif %}>User</option>
+                                        <option value="staff" {% if u.role == 'staff' %}selected{% endif %}>Staff</option>
+                                        <option value="admin" {% if u.is_admin %}selected{% endif %}>Admin</option>
+                                    </select>
+                                    <button type="submit">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="muted">No users.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if is_admin or is_staff %}
+        <div class="post-form dashboard-panel" id="sec-pricing">
+            <h3>Manage fleet pricing</h3>
+            {% if transportations %}
+            {% set ph_fleet = transportations|selectattr('region', 'equalto', 'PH')|list %}
+            {% set us_fleet = transportations|selectattr('region', 'equalto', 'US')|list %}
+            {% for region_code, region_name, fleet_items in [('PH', 'Philippines', ph_fleet), ('US', 'United States', us_fleet)] %}
+            <details class="fleet-region-card" {% if loop.first %}open{% endif %}>
+                <summary>
+                    <span class="fleet-region-title">{{ region_name }} fleet</span>
+                    <span class="fleet-region-meta">{{ fleet_items|length }} vehicle{% if fleet_items|length != 1 %}s{% endif %}</span>
+                </summary>
+                {% if fleet_items %}
+                <div class="dash-table-wrap">
+                    <table class="dash-table fleet-region-table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Current price (USD)</th>
+                                <th>Admin actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in fleet_items %}
+                            <tr>
+                                <td><strong>{{ t.name }}</strong></td>
+                                <td>${{ '%.2f' % t.price }}</td>
+                                <td>
+                                    <div class="fleet-admin-actions-row">
+                                        <button type="button" class="btn-sm btn-dark-inline btn-action-inline js-open-fleet-edit" data-target="fleet-edit-modal-{{ t.id }}">Update vehicle</button>
+                                        {% if is_admin %}
+                                        <form action="{{ url_for('admin_delete_transportation', transport_id=t.id) }}" method="POST" class="table-inline-form">
+                                            {{ csrf_input()|safe }}
+                                            <button type="submit" class="btn-danger-inline btn-action-inline" onclick="return confirm('Delete this vehicle from fleet?')">Remove vehicle</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    <dialog class="fleet-edit-modal" id="fleet-edit-modal-{{ t.id }}">
+                                        <form action="{{ url_for('admin_edit_transportation', transport_id=t.id) }}" method="POST" class="fleet-edit-modal-form">
+                                            {{ csrf_input()|safe }}
+                                            <button type="button" class="fleet-modal-close js-close-fleet-edit" data-target="fleet-edit-modal-{{ t.id }}" aria-label="Close">&times;</button>
+                                            <h4>Update vehicle</h4>
+                                            <p class="muted small">Edit fleet details for <strong>{{ t.name }}</strong>.</p>
+                                            <label class="field-label" for="edit-name-{{ t.id }}">Vehicle name</label>
+                                            <input id="edit-name-{{ t.id }}" type="text" name="name" value="{{ t.name }}" required>
+                                            <label class="field-label" for="edit-price-{{ t.id }}">Daily price (USD)</label>
+                                            <input id="edit-price-{{ t.id }}" type="number" step="0.01" name="price" value="{{ '%.2f' % t.price }}" required>
+                                            <label class="field-label" for="edit-region-{{ t.id }}">Region</label>
+                                            <select id="edit-region-{{ t.id }}" name="region" required>
+                                                <option value="PH" {% if t.region == 'PH' %}selected{% endif %}>Philippines</option>
+                                                <option value="US" {% if t.region == 'US' %}selected{% endif %}>United States</option>
+                                            </select>
+                                            <div class="fleet-edit-grid">
+                                                <div>
+                                                    <label class="field-label" for="edit-seats-{{ t.id }}">Seats</label>
+                                                    <input id="edit-seats-{{ t.id }}" type="number" name="seats" min="1" max="60" value="{{ t.seats if t.seats is not none else '' }}">
+                                                </div>
+                                                <div>
+                                                    <label class="field-label" for="edit-fuel-{{ t.id }}">Fuel type</label>
+                                                    <select id="edit-fuel-{{ t.id }}" name="fuel_type">
+                                                        <option value="">Not set</option>
+                                                        <option value="gasoline" {% if t.fuel_type == 'gasoline' %}selected{% endif %}>Gasoline</option>
+                                                        <option value="diesel" {% if t.fuel_type == 'diesel' %}selected{% endif %}>Diesel</option>
+                                                        <option value="electric" {% if t.fuel_type == 'electric' %}selected{% endif %}>Electric</option>
+                                                        <option value="hybrid" {% if t.fuel_type == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <label class="field-label" for="edit-transmission-{{ t.id }}">Transmission</label>
+                                            <select id="edit-transmission-{{ t.id }}" name="transmission">
+                                                <option value="">Not set</option>
+                                                <option value="automatic" {% if t.transmission == 'automatic' %}selected{% endif %}>Automatic</option>
+                                                <option value="manual" {% if t.transmission == 'manual' %}selected{% endif %}>Manual</option>
+                                            </select>
+                                            <label class="field-label" for="edit-image-url-{{ t.id }}">Image URL (optional)</label>
+                                            <input id="edit-image-url-{{ t.id }}" type="url" name="image_url" value="{{ t.image_url or '' }}" placeholder="https://...">
+                                            <label class="field-label" for="edit-description-{{ t.id }}">Description</label>
+                                            <textarea id="edit-description-{{ t.id }}" name="description" rows="2" maxlength="2000">{{ t.description or '' }}</textarea>
+                                            <label class="field-label" for="edit-specs-{{ t.id }}">Specs</label>
+                                            <textarea id="edit-specs-{{ t.id }}" name="specs" rows="2" maxlength="2000">{{ t.specs or '' }}</textarea>
+                                            <div class="fleet-edit-actions">
+                                                <button type="submit" class="btn btn-sm">Save changes</button>
+                                                <button type="button" class="btn-secondary-outline btn-sm js-close-fleet-edit" data-target="fleet-edit-modal-{{ t.id }}">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </dialog>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="muted">No {{ region_name }} vehicles yet.</p>
+                {% endif %}
+            </details>
+            {% endfor %}
+            {% else %}
+            <p class="muted">No vehicles.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_script %}
+    <script>
+        function togglePasswordForm() {
+            const form = document.getElementById('passwordForm');
+            const btn = document.getElementById('togglePasswordForm');
+            const opening = form.classList.contains('hidden-form');
+            form.classList.toggle('hidden-form', !opening);
+            btn.textContent = opening ? 'Hide password form' : 'Change password';
+            if (!opening) form.reset();
+        }
+
+        (function initDashboardSidebar() {
+            const links = Array.from(document.querySelectorAll('.dash-side-link'));
+            const panels = Array.from(document.querySelectorAll('.dashboard-panel'));
+            if (!links.length || !panels.length) return;
+            const requestRows = Array.from(document.querySelectorAll('#dash-my-requests tbody tr[data-rr-status]'));
+            const requestEmpty = document.getElementById('rr-empty-filtered');
+
+            function applyRequestFilter(filterVal) {
+                if (!requestRows.length) return;
+                const f = (filterVal || 'all').toLowerCase();
+                let shown = 0;
+                requestRows.forEach((row) => {
+                    const st = (row.dataset.rrStatus || '').toLowerCase();
+                    const visible = (f === 'all' || st === f);
+                    row.style.display = visible ? '' : 'none';
+                    if (visible) shown += 1;
+                });
+                if (requestEmpty) requestEmpty.hidden = shown !== 0;
+            }
+
+            function showPanel(targetId, requestFilter) {
+                panels.forEach((panel) => {
+                    panel.hidden = panel.id !== targetId;
+                });
+                links.forEach((link) => {
+                    const matchTarget = link.dataset.target === targetId;
+                    const ownFilter = link.dataset.requestFilter || 'all';
+                    const activeFilter = requestFilter || 'all';
+                    link.classList.toggle('is-active', matchTarget && ownFilter === activeFilter);
+                });
+                if (targetId === 'dash-my-requests') {
+                    applyRequestFilter(requestFilter || 'all');
+                }
+            }
+
+            links.forEach((link) => {
+                link.addEventListener('click', () => {
+                    showPanel(link.dataset.target, link.dataset.requestFilter || 'all');
+                });
+            });
+
+            showPanel(links[0].dataset.target, links[0].dataset.requestFilter || 'all');
+        })();
+
+        (function initRejectUI() {
+            const dialogs = Array.from(document.querySelectorAll('.rr-reject-modal'));
+            const openers = Array.from(document.querySelectorAll('.js-open-reject'));
+            const closers = Array.from(document.querySelectorAll('.js-close-reject'));
+            if (!dialogs.length) return;
+
+            openers.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-target');
+                    const target = document.getElementById(id);
+                    dialogs.forEach((dlg) => {
+                        if (dlg.open && dlg !== target) dlg.close();
+                    });
+                    if (target && typeof target.showModal === 'function') {
+                        target.showModal();
+                        const input = target.querySelector('input[name="rejection_reason"]');
+                        if (input) {
+                            input.value = '';
+                            input.focus();
+                        }
+                    }
+                });
+            });
+
+            closers.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-target');
+                    const target = document.getElementById(id);
+                    if (target && typeof target.close === 'function') target.close();
+                });
+            });
+
+            dialogs.forEach((dlg) => {
+                dlg.addEventListener('click', (ev) => {
+                    if (ev.target === dlg) dlg.close();
+                });
+                const form = dlg.querySelector('form');
+                if (!form) return;
+                form.addEventListener('submit', (ev) => {
+                    const reason = form.querySelector('input[name="rejection_reason"]');
+                    if (!reason || !reason.value.trim()) {
+                        ev.preventDefault();
+                        if (reason) reason.focus();
+                    }
+                });
+            });
+        })();
+
+        (function initFleetEditUI() {
+            const dialogs = Array.from(document.querySelectorAll('.fleet-edit-modal'));
+            const openers = Array.from(document.querySelectorAll('.js-open-fleet-edit'));
+            const closers = Array.from(document.querySelectorAll('.js-close-fleet-edit'));
+            if (!dialogs.length) return;
+
+            openers.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-target');
+                    const dlg = document.getElementById(id);
+                    dialogs.forEach((d) => {
+                        if (d.open && d !== dlg) d.close();
+                    });
+                    if (dlg && typeof dlg.showModal === 'function') dlg.showModal();
+                });
+            });
+
+            closers.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-target');
+                    const dlg = document.getElementById(id);
+                    if (dlg && typeof dlg.close === 'function') dlg.close();
+                });
+            });
+
+            dialogs.forEach((dlg) => {
+                dlg.addEventListener('click', (ev) => {
+                    if (ev.target === dlg) dlg.close();
+                });
+            });
+        })();
+    </script>
+{% endblock %}

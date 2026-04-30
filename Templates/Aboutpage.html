@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}About — {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Aboutpage.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-about{% endblock %}
+
+{% block content %}
+    <header class="about-hero">
+        <h1>About {{ site_brand }}</h1>
+        <p>Modern car rental for Cebu and beyond—online booking, clear rates, and dependable service.</p>
+    </header>
+
+    <section class="about-section">
+        <h2>Who we are</h2>
+        <p>{{ site_brand }} is your digital counter for self‑serve rentals. We focus on transparent pricing, a curated fleet, and a checkout flow that keeps your booking and receipt in one dashboard.</p>
+        <p>Whether you need an economy runabout or space for the family, our catalog stays synced with the vehicles admins and staff publish for you.</p>
+    </section>
+
+    <section class="contact-section">
+        <h2>Contact</h2>
+        <p>Questions about a booking or fleet listing? Reach us any time.</p>
+        <p><b>Email:</b> hello@chukakoyrental.local</p>
+        <p><b>Phone:</b> +63 32 000 0000</p>
+        <p><b>Address:</b> Chukakoy Plaza, Metro Cebu</p>
+    </section>
+{% endblock %}

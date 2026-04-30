@@ -1,0 +1,93 @@
+﻿{% extends "base.html" %}
+{% block title %}Terms &amp; Conditions â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/RentalCompliance.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-rental{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    {% set rental_step = 2 %}
+    {% include 'partials/RentalStepper.html' %}
+
+    <div class="dashboard rc-page ck-container">
+        <div class="welcome">
+            <h2>Terms &amp; Conditions</h2>
+            <p>Read the terms below. When you agree, you will continue to a <strong>separate</strong> page to upload your ID.</p>
+            {% if transport and pending %}
+            <p class="rc-summary"><strong>Vehicle:</strong> {{ transport.name }} Â· <strong>Estimated total:</strong> ${{ '%.2f' % pending.total_price }} Â· <strong>Dates:</strong> {{ pending.pickup_date }} â†’ {{ pending.return_date }}</p>
+            {% endif %}
+        </div>
+
+        <div class="post-form rc-terms-block">
+            <h3>Terms &amp; Conditions</h3>
+            <div class="rc-terms-scroll" tabindex="0">
+                <h4 class="rc-terms-h">Introduction</h4>
+                <p>These Terms and Conditions (â€œTermsâ€) govern the rental of vehicles and the use of services provided by the Company. By accessing, booking, or using our services, you acknowledge that you have read, understood, and agreed to be legally bound by these Terms.</p>
+
+                <h4 class="rc-terms-h">Eligibility</h4>
+                <p>You must be at least twenty-one (21) years of age and possess a valid, government-issued driverâ€™s license. The Company reserves the right to verify all submitted documents and deny service if requirements are not met.</p>
+
+                <h4 class="rc-terms-h">Booking and Agreement</h4>
+                <p>All reservations are subject to vehicle availability and confirmation. The Company reserves the right to cancel or refuse any booking if false, incomplete, or misleading information is provided.</p>
+
+                <h4 class="rc-terms-h">Rental Period</h4>
+                <p>The rental period begins at the agreed date and time and ends upon the official return of the vehicle. Any extension must be approved in advance. Late returns will incur additional charges based on the applicable rates.</p>
+
+                <h4 class="rc-terms-h">Fees and Payment</h4>
+                <p>All rental fees, applicable taxes, and a refundable security deposit must be settled prior to vehicle release. Additional charges may apply for late returns, damages, traffic violations, or breach of these Terms.</p>
+
+                <h4 class="rc-terms-h">Security Deposit</h4>
+                <p>A security deposit is required to cover potential damages, penalties, or unpaid charges. The deposit will be refunded within a reasonable period after vehicle inspection, subject to deductions if necessary.</p>
+
+                <h4 class="rc-terms-h">Use of Vehicle</h4>
+                <p>The vehicle must only be used for lawful and authorized purposes. You agree not to use the vehicle for illegal activities, racing, commercial use (unless permitted), or by any unauthorized driver.</p>
+
+                <h4 class="rc-terms-h">Driver Responsibility</h4>
+                <p>You are responsible for ensuring that the vehicle is operated safely and in compliance with all traffic laws and regulations. Any fines, penalties, or legal consequences incurred during the rental period shall be your sole responsibility.</p>
+
+                <h4 class="rc-terms-h">Vehicle Condition and Inspection</h4>
+                <p>You are required to inspect the vehicle before use and report any existing damage. Failure to report pre-existing issues may result in liability for such damages upon return.</p>
+
+                <h4 class="rc-terms-h">Fuel Policy</h4>
+                <p>The vehicle must be returned with the same fuel level as when it was received. If not, refueling charges and service fees may be applied.</p>
+
+                <h4 class="rc-terms-h">Maintenance and Care</h4>
+                <p>You agree to take reasonable care of the vehicle and ensure it is properly secured when not in use. Any mechanical issues or warning indicators must be reported immediately.</p>
+
+                <h4 class="rc-terms-h">Accidents, Damage, and Theft</h4>
+                <p>In the event of an accident, damage, or theft, you must notify the Company and appropriate authorities immediately. You may be held liable for repair costs or losses depending on the circumstances.</p>
+
+                <h4 class="rc-terms-h">Return Policy</h4>
+                <p>The vehicle must be returned on time, at the agreed location, and in a clean and proper condition. Additional cleaning, repair, or relocation fees may apply if the vehicle is returned in unsatisfactory condition.</p>
+
+                <h4 class="rc-terms-h">Termination of Agreement</h4>
+                <p>The Company reserves the right to terminate this agreement without prior notice if any Terms are violated. In such cases, the vehicle must be returned immediately, and no refunds will be issued.</p>
+
+                <h4 class="rc-terms-h">Limitation of Liability</h4>
+                <p>To the fullest extent permitted by law, the Company shall not be liable for any indirect, incidental, or consequential damages, including loss of personal property.</p>
+
+                <h4 class="rc-terms-h">Amendments to Terms</h4>
+                <p>The Company reserves the right to modify or update these Terms at any time. Continued use of the service constitutes acceptance of any revised Terms.</p>
+
+                <h4 class="rc-terms-h">Governing Law</h4>
+                <p>These Terms shall be governed by and interpreted in accordance with applicable local laws and regulations.</p>
+
+                <p class="rc-terms-note"><strong>Note:</strong> This booking flow is operated as part of a <strong>classroom / demo</strong> environment ({{ site_brand }}). Operational steps may differ from a live commercial rental platform.</p>
+            </div>
+        </div>
+
+        <form class="post-form rc-form" action="{{ url_for('rental_terms') }}" method="POST">
+            {{ csrf_input()|safe }}
+            <h3>Your agreement</h3>
+            <label class="rc-check">
+                <input type="checkbox" name="terms_agree" value="1" required>
+                <span>I have read and agree to the Terms &amp; Conditions above.</span>
+            </label>
+            <button type="submit" class="btn-publish">Continue to ID upload</button>
+            <a class="cancel-link rc-cancel" href="{{ url_for('transportations') }}">Cancel and return to fleet</a>
+        </form>
+    </div>
+{% endblock %}
+

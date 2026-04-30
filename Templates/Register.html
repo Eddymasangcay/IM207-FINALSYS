@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Register — {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Loginpage.css') }}">
+{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+    <div class="auth-shell">
+        <div class="auth-card">
+            <h1>Create account</h1>
+            <p class="auth-lead">Join {{ site_brand }} to rent cars and manage bookings in one place.</p>
+            {% if error %}
+            <div class="auth-alert" role="alert">{{ error }}</div>
+            {% endif %}
+            <form action="{{ url_for('register') }}" method="POST">
+                {{ csrf_input()|safe }}
+                <label class="auth-label" for="fullname">Full name</label>
+                <input id="fullname" type="text" name="fullname" placeholder="Full name" required autocomplete="name">
+
+                <label class="auth-label" for="email">Email</label>
+                <input id="email" type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+
+                <label class="auth-label" for="new_username">Username</label>
+                <input id="new_username" type="text" name="new_username" placeholder="Choose a username" required autocomplete="username">
+
+                <label class="auth-label" for="new_password">Password</label>
+                <input id="new_password" type="password" name="new_password" placeholder="Create a password" required autocomplete="new-password">
+
+                <label class="auth-label" for="confirm_password">Confirm password</label>
+                <input id="confirm_password" type="password" name="confirm_password" placeholder="Repeat password" required autocomplete="new-password">
+
+                <label class="auth-label" for="region">Region</label>
+                <select id="region" name="region" class="auth-select" required>
+                    <option value="" selected disabled>Choose your region</option>
+                    <option value="PH">Philippines — rent vehicles available in PH</option>
+                    <option value="US">United States — rent vehicles available in US</option>
+                </select>
+
+                <label class="auth-label" for="birthdate">Date of birth</label>
+                <p class="auth-hint">You must be at least 21 years old to register and rent.</p>
+                <input id="birthdate" type="date" name="birthdate" class="auth-select" required max="{{ birthdate_max }}" min="1940-01-01">
+
+                <button class="auth-submit" type="submit">Register</button>
+            </form>
+            <p class="auth-switch">Already registered? <a href="{{ url_for('loginpage') }}">Log in</a></p>
+        </div>
+    </div>
+{% endblock %}

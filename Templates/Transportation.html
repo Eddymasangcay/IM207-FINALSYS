@@ -1,0 +1,253 @@
+﻿{% extends "base.html" %}
+{% block title %}Fleet â€” {{ site_brand }}{% endblock %}
+{% block head_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='Styles/Transportation.css') }}">
+{% endblock %}
+{% block body_class %}ck-page-fleet{% endblock %}
+{% block main_class %}ck-main--wide{% endblock %}
+
+{% block content %}
+    <header class="page-hero">
+        <h1>Our fleet</h1>
+        <p>Browse vehicles for your region. Open details for full specs, then book when you are ready.</p>
+        {% if viewer and not (is_admin or is_staff) %}
+        <p class="page-hero-region">Showing vehicles for <strong>{{ region_label(viewer_region) }}</strong> â€” update region in your <a href="{{ url_for('dashboard') }}">dashboard</a> if needed.</p>
+        {% elif viewer and (is_admin or is_staff) %}
+        <p class="page-hero-region muted-hero">Staff view: all regions visible.</p>
+        {% endif %}
+        <div class="fleet-toolbar-sticky">
+        <form class="fleet-search" action="{{ url_for('transportations') }}" method="get">
+            <input type="search" name="q" value="{{ search_q or '' }}" placeholder="Search by vehicle name" aria-label="Search fleet">
+            <input type="text" name="location" value="{{ search_location or '' }}" placeholder="Pickup branch/city (optional)" aria-label="Pickup location">
+            <input type="date" name="pickup_date" value="{{ search_pickup or '' }}" aria-label="Pickup date">
+            <input type="date" name="return_date" value="{{ search_return or '' }}" aria-label="Return date">
+            <input type="number" name="min_price" value="{{ filter_min_price }}" step="0.01" min="0" placeholder="Min price" aria-label="Minimum daily price">
+            <input type="number" name="max_price" value="{{ filter_max_price }}" step="0.01" min="0" placeholder="Max price" aria-label="Maximum daily price">
+            <select name="seats" aria-label="Minimum seats">
+                <option value="">Any seats</option>
+                {% for s in [2, 4, 5, 7, 8, 12] %}
+                <option value="{{ s }}" {% if filter_seats == s %}selected{% endif %}>{{ s }}+ seats</option>
+                {% endfor %}
+            </select>
+            <select name="fuel_type" aria-label="Fuel type">
+                <option value="">Any fuel</option>
+                <option value="gasoline" {% if filter_fuel == 'gasoline' %}selected{% endif %}>Gasoline</option>
+                <option value="diesel" {% if filter_fuel == 'diesel' %}selected{% endif %}>Diesel</option>
+                <option value="hybrid" {% if filter_fuel == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                <option value="electric" {% if filter_fuel == 'electric' %}selected{% endif %}>Electric</option>
+            </select>
+            <select name="transmission" aria-label="Transmission">
+                <option value="">Any transmission</option>
+                <option value="automatic" {% if filter_transmission == 'automatic' %}selected{% endif %}>Automatic</option>
+                <option value="manual" {% if filter_transmission == 'manual' %}selected{% endif %}>Manual</option>
+            </select>
+            <select name="region" aria-label="Region filter">
+                <option value="">Any region</option>
+                <option value="PH" {% if filter_region == 'PH' %}selected{% endif %}>Philippines</option>
+                <option value="US" {% if filter_region == 'US' %}selected{% endif %}>United States</option>
+            </select>
+            <select name="sort" aria-label="Sort fleet">
+                <option value="newest" {% if filter_sort == 'newest' %}selected{% endif %}>Newest first</option>
+                <option value="price_low" {% if filter_sort == 'price_low' %}selected{% endif %}>Price: low to high</option>
+                <option value="price_high" {% if filter_sort == 'price_high' %}selected{% endif %}>Price: high to low</option>
+                <option value="name_az" {% if filter_sort == 'name_az' %}selected{% endif %}>Name: A to Z</option>
+            </select>
+            <button type="submit">Search</button>
+            {% if search_q or search_location or search_pickup or search_return or filter_min_price or filter_max_price or filter_seats or filter_fuel or filter_transmission or filter_region %}
+            <a class="fleet-search-clear" href="{{ url_for('transportations') }}">Clear</a>
+            {% endif %}
+        </form>
+        </div>
+        {% if has_date_filter %}
+        <p class="page-hero-region">Availability mode is active for {{ search_pickup }} â†’ {{ search_return }}. Cards marked unavailable cannot be booked for those dates.</p>
+        {% endif %}
+    </header>
+
+    {% set rental_step = 1 %}
+    {% include 'partials/RentalStepper.html' %}
+
+    <script type="application/json" id="fleet-json-data">{{ fleet_json|safe }}</script>
+
+    <h2 class="section-title">Available vehicles</h2>
+    <div class="cards fleet-cards">
+        {% for t in transportations %}
+        {% set img = vehicle_image_url(t) %}
+        <article class="card fleet-card fleet-card-compact" id="t-{{ t.id }}">
+            <div class="fleet-card-media">
+                {% if img %}
+                <img src="{{ img }}" alt="{{ t.name }}">
+                {% else %}
+                <div class="card-placeholder" role="img" aria-label="{{ t.name }}"></div>
+                {% endif %}
+                <span class="region-pill">{{ region_label(t.region) }}</span>
+                {% if has_date_filter and t.id in unavailable_ids %}
+                <span class="region-pill region-pill-unavailable">Unavailable</span>
+                {% endif %}
+            </div>
+            <div class="fleet-card-body">
+                <h3>{{ t.name }}</h3>
+                <p class="fleet-specs">
+                    {% if t.seats %}{{ t.seats }} seats{% endif %}
+                    {% if t.fuel_type %}{% if t.seats %} Â· {% endif %}{{ t.fuel_type|title }}{% endif %}
+                    {% if t.transmission %} Â· {{ t.transmission|title }}{% endif %}
+                </p>
+                <p class="fleet-price"><b>{{ money_by_region(t.price, t.region) }}</b> <span class="per">/ day</span></p>
+                <div class="fleet-card-actions">
+                    <a class="fleet-detail-link" href="{{ url_for('vehicle_detail', vehicle_id=t.id, pickup_date=search_pickup or none, return_date=search_return or none) }}">Full page</a>
+                    <button type="button" class="btn btn-outline fleet-open-modal" data-vehicle-id="{{ t.id }}">Quick view</button>
+                </div>
+            </div>
+        </article>
+        {% else %}
+        <p class="empty-fleet">
+            {% if search_q %}
+                No vehicles match â€œ{{ search_q }}â€.
+            {% else %}
+                No vehicles in the fleet yet.
+            {% endif %}
+        </p>
+        {% endfor %}
+    </div>
+
+    <dialog class="fleet-modal" id="fleet-modal" aria-labelledby="fleet-modal-title">
+        <div class="fleet-modal-inner">
+            <button type="button" class="fleet-modal-close" id="fleet-modal-close" aria-label="Close">&times;</button>
+            <div class="fleet-modal-grid">
+                <div class="fleet-modal-media">
+                    <img id="fleet-modal-img" src="" alt="">
+                </div>
+                <div class="fleet-modal-copy">
+                    <p class="fleet-modal-region" id="fleet-modal-region"></p>
+                    <h2 id="fleet-modal-title"></h2>
+                    <p class="fleet-modal-price" id="fleet-modal-price"></p>
+                    <div class="fleet-modal-section">
+                        <h4>Description</h4>
+                        <p id="fleet-modal-desc" class="fleet-modal-desc"></p>
+                    </div>
+                    <div class="fleet-modal-section">
+                        <h4>Specs</h4>
+                        <p id="fleet-modal-specs" class="fleet-modal-specs"></p>
+                    </div>
+                    <p id="fleet-modal-availability" class="fleet-modal-availability"></p>
+                </div>
+            </div>
+            <div class="fleet-modal-actions">
+                <a class="btn btn-outline fleet-modal-fullpage" id="fleet-modal-fullpage" href="#">Open full vehicle page</a>
+                {% if session.get('username') %}
+                <form id="fleet-modal-book-form" class="fleet-modal-book" method="post" action="">
+                    {{ csrf_input()|safe }}
+                    <input type="hidden" name="pickup_date" value="{{ search_pickup or '' }}">
+                    <input type="hidden" name="return_date" value="{{ search_return or '' }}">
+                    <label class="qty-label" for="fleet-modal-qty">Rental days</label>
+                    <input id="fleet-modal-qty" type="number" name="quantity" value="1" min="1" max="365" class="qty-input">
+                    <button type="submit" class="btn">Book this vehicle</button>
+                </form>
+                {% else %}
+                <p class="fleet-modal-login-hint">Please <a href="{{ url_for('loginpage') }}">log in</a> to book.</p>
+                {% endif %}
+                <button type="button" class="btn-secondary-outline" id="fleet-modal-close-bottom">Close</button>
+            </div>
+        </div>
+    </dialog>
+
+{% endblock %}
+
+{% block body_script %}
+    <script>
+        (function () {
+            var dialog = document.getElementById("fleet-modal");
+            if (!dialog) return;
+
+            var dataEl = document.getElementById("fleet-json-data");
+            var fleet = [];
+            try {
+                fleet = JSON.parse(dataEl.textContent || "[]");
+            } catch (e) {
+                fleet = [];
+            }
+            var byId = {};
+            fleet.forEach(function (v) { byId[v.id] = v; });
+
+            var imgEl = document.getElementById("fleet-modal-img");
+            var titleEl = document.getElementById("fleet-modal-title");
+            var regionEl = document.getElementById("fleet-modal-region");
+            var priceEl = document.getElementById("fleet-modal-price");
+            var descEl = document.getElementById("fleet-modal-desc");
+            var specsEl = document.getElementById("fleet-modal-specs");
+            var availabilityEl = document.getElementById("fleet-modal-availability");
+            var form = document.getElementById("fleet-modal-book-form");
+            var qtyInput = document.getElementById("fleet-modal-qty");
+            var fullPageLink = document.getElementById("fleet-modal-fullpage");
+            var pickupDate = {{ (search_pickup or '')|tojson }};
+            var returnDate = {{ (search_return or '')|tojson }};
+
+            function openFor(id) {
+                var v = byId[id];
+                if (!v) return;
+                titleEl.textContent = v.name;
+                regionEl.textContent = v.region_label || "";
+                var priceText = v.formatted_price || ("$" + Number(v.price).toFixed(2));
+                priceEl.innerHTML = "<strong>" + priceText + "</strong> <span class=\"per\">/ day</span>";
+                descEl.textContent = v.description || "No description provided.";
+                specsEl.textContent = v.specs || "No specs listed.";
+                if (availabilityEl) {
+                    availabilityEl.textContent = v.available ? "Available for selected dates." : "Unavailable for selected dates.";
+                    availabilityEl.className = v.available ? "fleet-modal-availability available" : "fleet-modal-availability unavailable";
+                }
+                if (v.image) {
+                    imgEl.src = v.image;
+                    imgEl.alt = v.name;
+                    imgEl.style.display = "";
+                } else {
+                    imgEl.removeAttribute("src");
+                    imgEl.alt = "";
+                    imgEl.style.display = "none";
+                }
+                if (form) {
+                    form.action = "/book/" + id;
+                    var submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = !v.available;
+                        submitBtn.textContent = v.available ? "Book this vehicle" : "Unavailable for these dates";
+                    }
+                }
+                if (qtyInput) qtyInput.value = "1";
+                if (fullPageLink) {
+                    var q = "/vehicle/" + id;
+                    if (pickupDate && returnDate) q += "?pickup_date=" + encodeURIComponent(pickupDate) + "&return_date=" + encodeURIComponent(returnDate);
+                    fullPageLink.href = q;
+                }
+                if (typeof dialog.showModal === "function") {
+                    dialog.showModal();
+                } else {
+                    dialog.setAttribute("open", "open");
+                }
+            }
+
+            function closeModal() {
+                if (typeof dialog.close === "function") {
+                    dialog.close();
+                } else {
+                    dialog.removeAttribute("open");
+                }
+            }
+
+            document.querySelectorAll(".fleet-open-modal").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var id = parseInt(btn.getAttribute("data-vehicle-id"), 10);
+                    if (!isNaN(id)) openFor(id);
+                });
+            });
+
+            document.getElementById("fleet-modal-close").addEventListener("click", closeModal);
+            document.getElementById("fleet-modal-close-bottom").addEventListener("click", closeModal);
+            dialog.addEventListener("click", function (ev) {
+                if (ev.target === dialog) closeModal();
+            });
+            document.addEventListener("keydown", function (ev) {
+                if (ev.key === "Escape" && dialog.open) closeModal();
+            });
+        })();
+    </script>
+{% endblock %}
+
