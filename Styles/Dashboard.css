@@ -687,23 +687,41 @@ body.ck-page-dashboard .dashboard {
 
     .dashboard-sidebar {
         position: static;
-        overflow-x: auto;
-        flex-direction: row;
+        overflow-x: visible;
+        flex-direction: column;
         flex-wrap: nowrap;
         padding: 12px;
+        gap: 10px;
+        max-width: 100%;
     }
 
     .dashboard-sidebar h3 {
         display: none;
     }
 
+    .dash-side-group-label {
+        margin-top: 2px;
+    }
+
+    .dash-submenu,
+    .dash-advanced {
+        width: 100%;
+    }
+
+    .dash-submenu .dash-side-link,
+    .dash-advanced .dash-side-link {
+        margin-top: 8px;
+    }
+
     .dash-side-link {
-        white-space: nowrap;
-        flex: 0 0 auto;
+        white-space: normal;
+        width: 100%;
+        flex: 1 1 auto;
     }
     
     .post-form {
         padding: 20px;
+        overflow: hidden;
     }
 
     .publish-grid {
@@ -716,6 +734,33 @@ body.ck-page-dashboard .dashboard {
 
     .fleet-edit-grid {
         grid-template-columns: 1fr;
+    }
+
+    .booking-post {
+        flex-direction: column;
+    }
+
+    .booking-thumb {
+        width: 100%;
+        height: auto;
+        max-height: 180px;
+    }
+
+    .booking-post-body {
+        width: 100%;
+    }
+
+    .dashboard-content .dash-table-wrap,
+    .dashboard-content .rr-user-table-wrap,
+    .dashboard-content .rr-admin-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dashboard-content .dash-table,
+    .dashboard-content .rr-user-table,
+    .dashboard-content .rr-admin-table {
+        min-width: 560px;
     }
 }
 

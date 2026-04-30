@@ -203,6 +203,7 @@ a:focus-visible {
 @media (max-width: 900px) {
     .site-nav-toggle {
         display: flex;
+        flex-shrink: 0;
     }
 
     .site-nav {
@@ -226,6 +227,13 @@ a:focus-visible {
     .site-header-inner {
         position: relative;
         flex-wrap: wrap;
+    }
+
+    .site-logo {
+        font-size: 1rem;
+        max-width: calc(100% - 60px);
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .site-nav a {
