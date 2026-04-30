@@ -747,6 +747,35 @@ body.ck-page-dashboard .dashboard {
         padding: 8px;
     }
 
+    .dash-accordion-panel {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 10px;
+        background: #1a2433;
+        overflow: hidden;
+    }
+
+    .dash-accordion-panel > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 9px 11px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #cbd5e1;
+        border-bottom: 1px solid transparent;
+    }
+
+    .dash-accordion-panel[open] > summary {
+        border-bottom-color: rgba(148, 163, 184, 0.24);
+    }
+
+    .dash-accordion-panel > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .dash-accordion-content {
+        padding: 8px;
+    }
+
     .dash-submenu,
     .dash-advanced {
         width: 100%;
@@ -764,8 +793,9 @@ body.ck-page-dashboard .dashboard {
     }
     
     .post-form {
-        padding: 20px;
+        padding: 16px;
         overflow: hidden;
+        border-radius: 16px;
     }
 
     .publish-grid {
@@ -1147,14 +1177,15 @@ body.ck-page-dashboard .dashboard {
 @media (max-width: 600px) {
     .profile-header {
         flex-direction: row;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 14px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
     }
 
     .profile-avatar {
-        width: 64px;
-        height: 64px;
+        width: 54px;
+        height: 54px;
+        border-width: 2px;
     }
 
     .profile-intro {
@@ -1163,22 +1194,115 @@ body.ck-page-dashboard .dashboard {
     }
 
     .profile-intro h2 {
-        font-size: 1.65rem;
-        line-height: 1.2;
-        margin-bottom: 4px;
+        font-size: 1.2rem;
+        line-height: 1.25;
+        margin-bottom: 2px;
         word-break: break-word;
     }
 
     .profile-sub {
-        font-size: 0.9rem;
-        line-height: 1.45;
+        font-size: 0.78rem;
+        line-height: 1.35;
+        margin-bottom: 4px;
     }
 
     .welcome {
-        padding: 18px 14px;
+        padding: 12px 10px;
+        border-radius: 14px;
+    }
+
+    .welcome .muted {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
     }
 
     .stat-cards {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .stat-card {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .stat-label {
+        font-size: 0.64rem;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+    }
+
+    .stat-value-small,
+    .stat-card-hint .stat-value {
+        font-size: 0.82rem;
+        line-height: 1.3;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .admin-stat-card {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .admin-stat-label {
+        font-size: 0.58rem;
+        margin-bottom: 5px;
+    }
+
+    .admin-stat-value {
+        font-size: 1.2rem;
+    }
+
+    .admin-graphs {
+        margin-bottom: 14px;
+    }
+
+    .admin-graphs h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .admin-graphs-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .admin-graph-card {
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    .admin-graph-card h4 {
+        font-size: 0.86rem;
+        margin-bottom: 8px;
+    }
+
+    .bar-head {
+        font-size: 0.76rem;
+    }
+
+    .bar-track {
+        height: 8px;
+    }
+
+    .dash-sidebar-graphs {
+        margin-top: 6px;
+    }
+
+    .dash-sidebar-graphs .muted {
+        font-size: 0.78rem;
+        margin-bottom: 8px;
+    }
+
+    .dash-sidebar-graphs .admin-graphs-grid {
         grid-template-columns: 1fr;
     }
 }

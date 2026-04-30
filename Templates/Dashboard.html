@@ -78,32 +78,6 @@
                 <span class="admin-stat-value">{{ '%.1f' % admin_stats.fleet_utilization_pct }}%</span>
             </div>
         </div>
-        {% if admin_charts %}
-        <div class="post-form admin-graphs">
-            <h3>Operations graphs</h3>
-            <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
-            <div class="admin-graphs-grid">
-                <div class="admin-graph-card">
-                    <h4>Rental request statuses</h4>
-                    {% for item in admin_charts.rental_request_status %}
-                    <div class="bar-row">
-                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
-                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="admin-graph-card">
-                    <h4>Booking lifecycle</h4>
-                    {% for item in admin_charts.booking_lifecycle %}
-                    <div class="bar-row">
-                        <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
-                        <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
         {% endif %}
 
         <div class="dashboard-layout">
@@ -120,24 +94,67 @@
                             <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="pending_review">Awaiting admin</button>
                             <button type="button" class="dash-side-link" data-target="dash-my-requests" data-request-filter="rejected">Rejected</button>
                         </details>
-                        <button type="button" class="dash-side-link" data-target="sec-bookings">Your bookings</button>
-                        {% if is_staff or is_admin %}
-                        <button type="button" class="dash-side-link" data-target="sec-admin-bookings">All bookings (admin)</button>
-                        {% endif %}
-                        <button type="button" class="dash-side-link" data-target="dash-notifications">Notifications</button>
-                        <button type="button" class="dash-side-link" data-target="dash-profile">Profile</button>
-                        <button type="button" class="dash-side-link" data-target="dash-payment-methods">Payment methods</button>
-                        <button type="button" class="dash-side-link" data-target="dash-security">Security</button>
+                        <details class="dash-accordion-panel" open>
+                            <summary>Bookings and updates</summary>
+                            <div class="dash-accordion-content">
+                                <button type="button" class="dash-side-link" data-target="sec-bookings">Your bookings</button>
+                                {% if is_staff or is_admin %}
+                                <button type="button" class="dash-side-link" data-target="sec-admin-bookings">All bookings (admin)</button>
+                                {% endif %}
+                                <button type="button" class="dash-side-link" data-target="dash-notifications">Notifications</button>
+                            </div>
+                        </details>
+                        <details class="dash-accordion-panel" open>
+                            <summary>Account settings</summary>
+                            <div class="dash-accordion-content">
+                                <button type="button" class="dash-side-link" data-target="dash-profile">Profile</button>
+                                <button type="button" class="dash-side-link" data-target="dash-payment-methods">Payment methods</button>
+                                <button type="button" class="dash-side-link" data-target="dash-security">Security</button>
+                            </div>
+                        </details>
                     </div>
                 </details>
                 {% if is_staff %}
                 <details class="dash-mobile-group" open>
                     <summary>Operations</summary>
                     <div class="dash-mobile-links">
-                        <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
-                        <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
-                        <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
-                        <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
+                        <details class="dash-accordion-panel" open>
+                            <summary>Monitoring</summary>
+                            <div class="dash-accordion-content">
+                                <button type="button" class="dash-side-link" data-target="dash-id-queue">ID requests queue</button>
+                                <button type="button" class="dash-side-link" data-target="dash-analytics">Analytics</button>
+                                <button type="button" class="dash-side-link" data-target="sec-pricing">Fleet pricing</button>
+                                <button type="button" class="dash-side-link" data-target="sec-damage">Damage workflow</button>
+                            </div>
+                        </details>
+                        {% if admin_charts %}
+                        <details class="dash-accordion-panel dash-sidebar-graphs" open>
+                            <summary>Operations graphs</summary>
+                            <div class="dash-accordion-content">
+                                <p class="muted">Visual counts with exact numbers for quick monitoring.</p>
+                                <div class="admin-graphs-grid">
+                                    <div class="admin-graph-card">
+                                        <h4>Rental request statuses</h4>
+                                        {% for item in admin_charts.rental_request_status %}
+                                        <div class="bar-row">
+                                            <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                                            <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index }}" style="width: {{ item.pct }}%;"></span></div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="admin-graph-card">
+                                        <h4>Booking lifecycle</h4>
+                                        {% for item in admin_charts.booking_lifecycle %}
+                                        <div class="bar-row">
+                                            <div class="bar-head"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+                                            <div class="bar-track"><span class="bar-fill bar-fill-{{ loop.index + 4 }}" style="width: {{ item.pct }}%;"></span></div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
+                        {% endif %}
                     </div>
                 </details>
                 <details class="dash-mobile-group dash-advanced-group" open>
@@ -1070,6 +1087,12 @@
                     });
                 });
             });
+
+            if (window.matchMedia('(max-width: 768px)').matches && mobileGroups.length) {
+                mobileGroups.forEach((group, idx) => {
+                    group.open = idx === 0;
+                });
+            }
 
             showPanel(links[0].dataset.target, links[0].dataset.requestFilter || 'all');
         })();
