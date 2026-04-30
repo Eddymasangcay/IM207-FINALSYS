@@ -15,8 +15,14 @@
 
 ## 📌 Overview
 
-**IM207 Final System** is a capstone-style project designed to simplify car rental operations.  
-It includes core modules for customer booking, vehicle management, payment processing, and reservation tracking.
+****Chukakoy Car Rental System** is a web-based academic project developed to streamline and modernize day-to-day car rental operations.  
+The system is designed to provide a smoother experience for both customers and administrators by combining booking management, vehicle tracking, and payment processing in one platform.
+
+For customers, the platform offers an accessible way to browse available vehicles, select preferred rental schedules, and complete reservations online.  
+For administrators, it provides tools to manage car inventory, monitor booking activity, verify payment status, and keep rental records organized and up to date.
+
+The project also integrates secure online payment support through PayMongo and is deployed using Railway for cloud accessibility.  
+Overall, Chukakoy Car Rental System serves as a practical and user-focused solution that improves efficiency, reduces manual processes, and supports more reliable rental service management.
 
 ---
 
