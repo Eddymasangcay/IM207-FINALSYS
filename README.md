@@ -1,124 +1,167 @@
-# PF205 Transportation System
+# Chukakoy Car Rental System
 
 <div align="center">
 
-[![Java](https://img.shields.io/badge/Java_8-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Swing](https://img.shields.io/badge/Java_Swing-5382A1?style=for-the-badge&logo=java&logoColor=white)](https://docs.oracle.com/javase/tutorial/uiswing/)
-[![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
-[![NetBeans](https://img.shields.io/badge/Apache_NetBeans-1B6AC6?style=for-the-badge&logo=apache-netbeans-ide&logoColor=white)](https://netbeans.apache.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app)
+[![PayMongo](https://img.shields.io/badge/PayMongo-6A1B9A?style=for-the-badge&logo=moneygram&logoColor=white)](https://paymongo.com)
+[![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/board/t3X2NkmHzongN0VsYPoC4D/Chukakoy-Car-Rental---Entity-Relationship-Diagram?node-id=0-1&t=pq38QzFM8nLPN6Wv-1)
 
 </div>
 
 ---
 
-## Overview
+## 📌 Overview
 
+**Chukakoy Car Rental System** is a web-based academic project developed to streamline and modernize day-to-day car rental operations.  
+The system is designed to provide a smoother experience for both customers and administrators by combining booking management, vehicle tracking, and payment processing in one platform.
 
-**PF205 Transportation System** is a desktop academic project built with **Java Swing**. It supports everyday transportation booking workflows for **passengers (users)** and **administrators** in one application: managing routes, creating and tracking bookings, updating trip status, and viewing trip documents.
+For customers, the platform offers an accessible way to browse available vehicles, select preferred rental schedules, and complete reservations online.  
+For administrators, it provides tools to manage car inventory, monitor booking activity, verify payment status, and keep rental records organized and up to date.
 
-**Customers** can browse available routes, book seats, manage their bookings, and view a **boarding-pass style ticket** after booking or from their booking list.
-
-**Administrators** can maintain routes and vehicles, manage all bookings, update booking status (including completion), view **receipts** for completed trips, and preview passenger **tickets** when needed.
-
-Data is stored locally using **SQLite** (embedded database file created at runtime under `database/`).
-
----
-
-## Features
-
-- User registration and login with role-aware access (user vs admin)
-- Route listing with search and booking flow
-- Booking history for users; full booking management for admins
-- Booking status workflow (e.g. Pending through Arrived / Cancelled)
-- **Receipts** generated when a booking is marked **Arrived**
-- **Boarding pass / ticket** UI (designed ticket layout with main panel and stub)
-- Local **SQLite** persistence with automatic schema initialization
+The project also integrates secure online payment support through PayMongo and is deployed using Railway for cloud accessibility.  
+Overall, Chukakoy Car Rental System serves as a practical and user-focused solution that improves efficiency, reduces manual processes, and supports more reliable rental service management.
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-| Layer | Technology |
-| :---- | :--------- |
-| Language | Java (JDK 8) |
-| UI | Java Swing, NetBeans GUI Builder (`.form` / AbsoluteLayout) |
-| Database | SQLite (`sqlite-jdbc`) |
-| Supporting libraries | Absolute Layout, Beans Binding, EclipseLink (project classpath) |
-
----
-
-## Project Structure (high level)
-
-- `src/Main/` — Login shell and main navigation (`Mainframe`, `MainPage`, registration flow)
-- `src/UserInternalPages/` — Passenger-facing screens (transportation, bookings, settings)
-- `src/AdminInternalPages/` — Admin screens (transportation, bookings, users, settings)
-- `src/Configuration/` — Database connection, schema bootstrap, utilities (`ConnectionConfig`, receipts helper, etc.)
-- `src/UI/` — Shared UI helpers (document dialogs, receipt/ticket panels)
-- `database/` — Runtime SQLite file (`transportation.db`) created when the app connects
+- 🚗 Vehicle listing and availability management  
+- 📅 Online reservation and scheduling  
+- 💳 Payment integration (PayMongo)  
+- 👤 User authentication and account management  
+- 🛠️ Admin dashboard for fleet and booking control  
+- ☁️ Cloud deployment via Railway  
 
 ---
 
-## Prerequisites
+## 🧰 Tech Stack
 
-- **JDK 8** (matches project source/target `1.8`)
-- **Apache NetBeans** (recommended) or another IDE that can open Ant-based Java SE projects
-- JDBC driver JARs referenced by the project (e.g. **SQLite JDBC** under `src/Configuration/` as configured in NetBeans)
-
----
-
-## How to Run Locally
-
-### Option A — NetBeans
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
-   ```
-
-2. **Open project** — `File` → `Open Project…` and select this folder (NetBeans project with `nbproject/`).
-
-3. **Resolve libraries** — Ensure classpath JARs (SQLite JDBC, etc.) exist where `nbproject/project.properties` expects them.
-
-4. **Set main class** — Run **`Main.Mainframe`** (login window).
-
-5. **Run** — Right-click the project → **Run**, or **F6**.
-
-### Option B — Command line (Ant)
-
-If **Apache Ant** is installed:
-
-```bash
-cd path/to/PF205-TransportationSystem
-ant jar
-java -cp "dist/TransportationSystem.jar;path/to/sqlite-jdbc.jar;..." Main.Mainframe
-```
-
-Adjust classpath separators (`;` on Windows, `:` on macOS/Linux) and include all required JARs.
+- **Backend:** Python, Flask  
+- **Frontend:** HTML, CSS, JavaScript  
+- **Database:** PostgreSQL  
+- **Deployment:** Railway  
+- **Payments:** PayMongo  
+- **Design/ERD:** Figma  
 
 ---
 
-## Database
+## 🗂️ Entity-Relationship Diagram (ERD)
 
-On first run, tables such as **users**, **routes**, **bookings**, and **receipts** are created if missing (see `ConnectionConfig`). The database file path is resolved from the working directory under `database/transportation.db`.
+<div align="center">
+
+### Database Structure Overview  
+Design and relationship mapping for the **Chukakoy Car Rental System**
+
+🔗 **[Open ERD in Figma](https://www.figma.com/board/t3X2NkmHzongN0VsYPoC4D/Chukakoy-Car-Rental---Entity-Relationship-Diagram?node-id=0-1&t=pq38QzFM8nLPN6Wv-1)**
+
+</div>
 
 ---
 
-## Developer
+## 🧪 How to Run Locally
+
+### 1) Clone the repository
+
+    git clone https://github.com/your-username/your-repo-name.git
+    cd your-repo-name
+
+### 2) Create and activate a virtual environment
+
+**Windows (PowerShell)**
+
+    python -m venv venv
+    venv\Scripts\Activate
+
+**macOS/Linux**
+
+    python3 -m venv venv
+    source venv/bin/activate
+
+### 3) Install dependencies
+
+    pip install -r requirements.txt
+
+### 4) Configure environment variables
+
+Create a `.env` file in the project root, then add:
+
+    DATABASE_URL=postgresql://user:password@host:5432/dbname
+    PAYMONGO_SECRET_KEY=sk_test_or_live_replace_me
+    PAYMONGO_WEBHOOK_SECRET=whsk_replace_me
+    PUBLIC_APP_URL=http://127.0.0.1:5000
+    FLASK_SECRET_KEY=replace_with_a_long_random_string
+    PAYMONGO_PAYMENT_METHOD_TYPES=card,gcash,paymaya,grab_pay,shopee_pay
+    USD_TO_PHP_RATE=56.0
+
+### 5) Run the application
+
+    python main.py
+
+### 6) Open in browser
+
+`http://127.0.0.1:5000`
+
+---
+
+## 🌐 Live Demo
+
+Experience the deployed system here:  
+🔗 [Chukakoy Car Rental System (Railway)](https://chukakoycars.up.railway.app/)
+
+---
+
+## 👨‍💻 Developers
+
+<div align="center">
 
 <div align="center">
 
 <table>
   <tr>
     <td align="center">
-      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" alt="Developer" />
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
       <br />
-      <strong>Eduardo D. Masangcay</strong>
+      <strong>Eduardo D. Masangcay (Me)</strong>
       <br />
-      <em>BSIT 2-E</em>
+      <em>Web Developer</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
       <br />
-      <em>St. Cecilia's College-Cebu, Inc.</em>
+      <strong>John Paul G. Natad</strong>
+      <br />
+      <em>Database Analyst</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>Jerkean C. Gabrina</strong>
+      <br />
+      <em>Assistant Database Analyst</em>
+    </td>
+  </tr>
+</table>
+
+<br />
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>John Peter B. Gale</strong>
+      <br />
+      <em>Documentator</em>
+    </td>
+    <td align="center">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="90" height="90" />
+      <br />
+      <strong>Vince Gabriel Paquiabas</strong>
+      <br />
+      <em>Designer</em>
     </td>
   </tr>
 </table>
@@ -127,16 +170,26 @@ On first run, tables such as **users**, **routes**, **bookings**, and **receipts
 
 ---
 
-## Acknowledgements
+## 🚀 Deployment
 
-- [OpenJDK](https://openjdk.org/) — Java platform  
-- [SQLite](https://sqlite.org/) — embedded database  
-- [Apache NetBeans](https://netbeans.apache.org/) — IDE and project tooling  
-- [Shields.io](https://shields.io/) — README badges  
+This project is deployed using **Railway** for easy cloud hosting and continuous deployment.
 
 ---
 
-## License
+## 🙏 Acknowledgements
+
+Special thanks to the following platforms and tools that made this project possible:
+
+- [Flask](https://flask.palletsprojects.com/) — backend web framework  
+- [PostgreSQL](https://www.postgresql.org/) — relational database management  
+- [Railway](https://railway.app/) — deployment and cloud hosting  
+- [PayMongo](https://paymongo.com/) — online payment gateway integration  
+- [Figma](https://www.figma.com/) — ERD and design planning  
+- [Shields.io](https://shields.io/) — technology badges used in this README  
+
+---
+
+## 📜 License
 
 This project is developed for academic purposes at **St. Cecilia's College-Cebu, Inc.**
 
